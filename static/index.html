@@ -592,6 +592,17 @@ function renderMonthly() {
 // ============ 打分编辑器 ============
 let editingEmpId = null;
 
+function onDirectorTotalInput(val) {
+  const score = getEmpScore(currentMonth, editingEmpId);
+  if (val && parseFloat(val) > 0) {
+    score.directorTotal = parseFloat(val);
+  } else {
+    delete score.directorTotal;
+  }
+  saveData();
+  refreshModalTotals();
+}
+
 function openScoreEditor(empId) {
   editingEmpId = empId;
   const emp = appData.employees.find(e => e.id === empId);
@@ -701,7 +712,7 @@ function openScoreEditor(empId) {
         <div class="flex items-center gap-8 mb-3 text-sm pb-3 border-b border-slate-200">
           <div class="text-slate-500">自评总分：<span id="modalSelfTotal" class="font-bold text-slate-700 ml-1">0</span></div>
           <div class="text-slate-500">上级总分：<span id="modalSupTotal" class="font-bold text-slate-700 ml-1">0</span></div>
-          <div class="text-slate-500">总监总分：<span id="modalDirTotal" class="font-bold text-slate-700 ml-1">0</span></div>
+          <div class="text-slate-500">总监总分：<input type="number" id="modalDirTotalInput" class="w-20 px-2 py-1 border border-slate-300 rounded text-center text-sm ml-1" placeholder="直接打总分" oninput="onDirectorTotalInput(this.value)"> <span id="modalDirTotal" class="font-bold text-slate-700 ml-1">0</span></div>
         </div>
         <div class="flex items-center justify-between">
           <div class="text-sm text-slate-500">
@@ -1351,6 +1362,31 @@ function resetAll() {
   saveData();
   renderPage();
 }
+
+// ============ 总监总分支持 ============
+const _origCalc = calcEmpScore;
+calcEmpScore = function(emp, month) {
+  const r = _origCalc(emp, month);
+  const score = getEmpScore(month, emp.id);
+  const dt = parseFloat(score.directorTotal);
+  if (!isNaN(dt) && dt > 0) {
+    const w = r.weights;
+    r.dirTotal = dt;
+    r.total = Math.round((r.selfTotal * w.self + r.supTotal * w.supervisor + dt * w.director) * 100) / 100;
+    r.directorTotal = dt;
+  }
+  return r;
+};
+
+const _origOpenEditor = openScoreEditor;
+openScoreEditor = function(empId) {
+  _origOpenEditor(empId);
+  setTimeout(() => {
+    const score = getEmpScore(currentMonth, empId);
+    const input = document.getElementById('modalDirTotalInput');
+    if (input) input.value = score.directorTotal || '';
+  }, 50);
+};
 
 // ============ 初始化 ============
 loadData();
