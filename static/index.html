@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>雪豹市场部绩效考核工作台</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; }
+  .sidebar-item.active { background: linear-gradient(90deg, #2563eb 0%, #3b82f6 100%); color: white; }
+  .sidebar-item:hover:not(.active) { background: #f1f5f9; }
+  .score-input { -moz-appearance: textfield; }
+  .score-input::-webkit-outer-spin-button, .score-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  @media print {
+    .no-print { display: none !important; }
+    .print-area { display: block !important; }
+    body { background: white !important; }
+  }
+  .print-area { display: none; }
+  .fade-in { animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+</style>
+</head>
+<body class="bg-slate-100 min-h-screen">
+
+<div class="flex h-screen overflow-hidden">
+  <!-- 侧边栏 -->
+  <aside class="w-60 bg-white border-r border-slate-200 flex flex-col no-print">
+    <div class="p-5 border-b border-slate-100">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center text-white font-bold text-lg">雪</div>
+        <div>
+          <div class="font-bold text-slate-800 text-sm">绩效工作台</div>
+          <div class="text-xs text-slate-400">雪豹市场部</div>
+        </div>
+      </div>
+    </div>
+    <nav class="flex-1 p-3 space-y-1">
+      <div class="text-xs text-slate-400 px-3 py-2 font-medium">概览</div>
+      <a href="#" class="sidebar-item active flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 cursor-pointer transition" data-page="dashboard">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+        仪表盘
+      </a>
+      <div class="text-xs text-slate-400 px-3 py-2 font-medium mt-4">考核管理</div>
+      <a href="#" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 cursor-pointer transition" data-page="monthly">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+        月度考核
+      </a>
+      <a href="#" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 cursor-pointer transition" data-page="summary">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        数据汇总
+      </a>
+      <div class="text-xs text-slate-400 px-3 py-2 font-medium mt-4">基础数据</div>
+      <a href="#" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 cursor-pointer transition" data-page="employees">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+        员工管理
+      </a>
+      <a href="#" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 cursor-pointer transition" data-page="templates">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        考核模板
+      </a>
+      <div class="text-xs text-slate-400 px-3 py-2 font-medium mt-4">系统</div>
+      <a href="#" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 cursor-pointer transition" data-page="settings">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        数据备份
+      </a>
+    </nav>
+    <div class="p-4 border-t border-slate-100">
+      <div class="text-xs text-slate-400">数据保存在本地浏览器</div>
+      <div class="text-xs text-slate-300 mt-1">v1.0</div>
+    </div>
+  </aside>
+
+  <!-- 主内容区 -->
+  <main class="flex-1 flex flex-col overflow-hidden">
+    <!-- 顶部栏 -->
+    <header class="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between no-print">
+      <h1 id="pageTitle" class="text-lg font-bold text-slate-800">仪表盘</h1>
+      <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2">
+          <label class="text-sm text-slate-500">考核月份：</label>
+          <select id="monthSelector" class="border border-slate-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          </select>
+        </div>
+        <button onclick="window.print()" class="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm text-slate-600 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+          打印
+        </button>
+      </div>
+    </header>
+
+    <!-- 页面内容 -->
+    <div class="flex-1 overflow-y-auto p-6 scrollbar-thin" id="pageContent">
+    </div>
+  </main>
+</div>
+
+<!-- 打印区域 -->
+<div class="print-area" id="printArea"></div>
+
+<script>
+// ============ 错误捕获 ============
+window.onerror = function(msg, url, line, col, error) {
+  var el = document.getElementById("pageContent");
+  if (el) el.innerHTML = "<h2>JS Error: " + msg + " line:" + line + "</h2><pre>" + (error ? error.stack : "") + "</pre>";
+};
+
+// ============ API层（飞书多维表格后端） ============
+const API_BASE = '';  // 同源部署，留空即可
+
+async function apiGetScores(month) {
+  try {
+    const resp = await fetch(`${API_BASE}/api/scores?month=${encodeURIComponent(month)}`);
+    const data = await resp.json();
+    return data.scores || {};
+  } catch(e) {
+    console.error('从飞书加载数据失败:', e);
+    return null;
+  }
+}
+
+async function apiSaveScore(month, empId, empName, score) {
+  try {
+    const resp = await fetch(`${API_BASE}/api/score`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({month, emp_id: empId, emp_name: empName, score})
+    });
+    const data = await resp.json();
+    return data.success;
+  } catch(e) {
+    console.error('保存到飞书失败:', e);
+    return false;
+  }
+}
+
+// 同步当前月份所有数据到飞书（异步，不阻塞UI）
+let syncTimer = null;
+function syncToCloud() {
+  if (!currentMonth || !appData || !appData.monthlyData[currentMonth]) return;
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(async () => {
+    const monthData = appData.monthlyData[currentMonth];
+    for (const empId in monthData) {
+      const emp = appData.employees.find(e => e.id === empId);
+      if (emp) {
+        await apiSaveScore(currentMonth, empId, emp.name, monthData[empId]);
+      }
+    }
+    console.log('已同步到飞书:', currentMonth);
+  }, 1000);  // 1秒防抖
+}
+
+// ============ 数据层 ============
+const DEFAULT_DATA = {"employees": [{"id": "emp001", "name": "张洁", "dept": "市场部", "position": "产品经理", "templateKey": "市场部_产品经理"}, {"id": "emp002", "name": "朱虹", "dept": "市场部", "position": "市场运营", "templateKey": "市场部_市场运营"}, {"id": "emp003", "name": "邬佩希", "dept": "内容部", "position": "内容主管", "templateKey": "内容部_内容主管"}, {"id": "emp004", "name": "吴曼茹", "dept": "内容部", "position": "视频运营", "templateKey": "内容部_视频运营"}, {"id": "emp005", "name": "黄艺舟", "dept": "内容部", "position": "视频运营", "templateKey": "内容部_视频运营"}, {"id": "emp006", "name": "徐晓怡", "dept": "内容部", "position": "内容运营", "templateKey": "内容部_内容运营"}, {"id": "emp007", "name": "徐嘉钰", "dept": "设计部", "position": "美工", "templateKey": "设计部_美工"}, {"id": "emp008", "name": "朱玉华", "dept": "电商部", "position": "电商运营", "templateKey": "电商部_电商运营"}, {"id": "emp009", "name": "周飘", "dept": "电商部", "position": "电商运营", "templateKey": "电商部_电商运营"}, {"id": "emp010", "name": "韦汉灿", "dept": "电商部", "position": "电商运营", "templateKey": "电商部_电商运营"}, {"id": "emp011", "name": "顾晓华", "dept": "电商部", "position": "控价运营", "templateKey": "电商部_控价运营"}, {"id": "emp012", "name": "张玉萍", "dept": "电商部", "position": "电商美工", "templateKey": "电商部_电商美工"}, {"id": "emp013", "name": "黄蓉", "dept": "电商部", "position": "电商美工", "templateKey": "电商部_电商美工"}, {"id": "emp014", "name": "史晓芳", "dept": "电商部", "position": "电商主播", "templateKey": "电商部_电商主播"}, {"id": "emp015", "name": "吕凤霞", "dept": "电商部", "position": "电商主播", "templateKey": "电商部_电商主播"}, {"id": "emp016", "name": "夏梦洁", "dept": "电商仓", "position": "仓库主管", "templateKey": "电商仓_仓库主管"}, {"id": "emp017", "name": "邓海刚", "dept": "电商仓", "position": "打单员", "templateKey": "电商仓_打单员"}, {"id": "emp018", "name": "任健", "dept": "电商仓", "position": "配货员", "templateKey": "电商仓_配货员"}, {"id": "emp019", "name": "林文伟", "dept": "电商仓", "position": "配货员", "templateKey": "电商仓_配货员"}, {"id": "emp020", "name": "张彪", "dept": "电商仓", "position": "配货员", "templateKey": "电商仓_配货员"}, {"id": "emp021", "name": "刘君静", "dept": "电商仓", "position": "配货员", "templateKey": "电商仓_配货员"}, {"id": "emp022", "name": "贺燕", "dept": "电商仓", "position": "配货员", "templateKey": "电商仓_配货员"}], "templates": {"市场部_产品经理": {"name": "市场部_产品经理", "versions": [{"version": "v1", "effectiveMonth": "2026-08", "note": "初始版本", "weights": {"self": 0.2, "supervisor": 0.6, "director": 0.2}, "categories": [{"name": "工作能力", "items": [{"id": "item001", "name": "市场调研", "standard": "每月至少提交1份《市场/竞品/用户调研报告》（比如分析1个竞品、1个趋势、1个用户洞察），次月8日前提交 → 5分，逾期0分；报告中有1条以上建议被产品决策采纳 ≥1条 → 额外+3分；每月至少针对在售老品提出优化建议（卖点升级-产品详情页/宣传内容、包装调整、成本降低、配方微调）≥1条 → 5分；其中被采纳并落地执行 ≥1条 → 额外加3分；未完成按比例扣分。", "maxScore": 10.0}, {"id": "item002", "name": "项目进度规划", "standard": "每月5日前提交《产品部各项目进度表》（含家清、牙膏等所有在研/优化项目的时间轴、当前状态、下一步节点、责任人），并主动规划下月时间轴 → 25分；超过3天未交扣2分；时间轴逻辑明显错误（如打样在立项前）每处扣1分；提交上级审核后，发现错误或漏整理项目没有修改或补充的扣1分。", "maxScore": 25.0}, {"id": "item003", "name": "产品流程管理", "standard": "产品部当月所有项目节点（如调研、打样、产品资料完善、反馈优化、上新）按时完成比例：X≥90% →5分；90%＞X≥80% → 4分；80＞X≥60% → 3分；X＜60% → 0分。（研发、生产等外部节点不作为考核依据）。", "maxScore": 5.0}, {"id": "item004", "name": "打样测评反馈", "standard": "每次打样后（根据实际情况）3个工作日内提交《测评反馈表》（含数据/感官评价、改进方向）→ 5分；反馈后跟进研发调试，直至样品确认，闭环率100% → 5分；每超时或未闭环扣2分。（以下情形除外：研发或供应商未反馈必要数据;样品本身问题导致无法闭环。）当月无打样测评则自动得10分。", "maxScore": 10.0}, {"id": "item005", "name": "产品资料维护", "standard": "针对公司所有产品，要定时按需将产品信息（产品信息、包装宣传图、卖点、相关报告、销售话术案例）整理为产品手册，每月至少整理2个产品于飞书；若当月有新上市产品，必须在上市前10天交付完整资料 →准确及时率100% → 25分，未整理一个产品扣10分，每缺1项扣1分。", "maxScore": 25.0}, {"id": "item006", "name": "市场培训", "standard": "若有销售团队培训需求，需100%及时响应（需求发出后1个工作日内响应并在规定时间内完成培训工作或相应安排）→ 5分，每出现1次未及时响应扣2分，扣完为止；当月无培训需求则自动得5分。", "maxScore": 5.0}, {"id": "item007", "name": "老品客诉问题", "standard": "每月收集到的老品问题（来自销售、客诉等）记录在案，并在约定周期内（如7天）给出解决方案并联系各部门进行沟通并执行：闭环率≥90% → 5分 ，X≥80% → 4分 ，X≥70% → 3分 ，X＜60% → 0分。", "maxScore": 5.0}, {"id": "item008", "name": "跨部门沟通记录", "standard": "无特殊情况，每次跨部门沟通会（研发/销售/领导）后应24小时内输出《沟通纪要》（含结论、待办、责任人、截止时间）：及时提交率 100% → 5分；及时提交率≥90% → 4分；及时提交率≥80% → 3分；及时提交率＜80% → 0分。", "maxScore": 5.0}, {"id": "item009", "name": "工作协调配合", "standard": "承接的线下活动（如路演、展会）按时、按标准完成率 100% → 10分，每缺1项或重大失误扣3分；", "maxScore": 10.0}]}], "bonuses": [{"id": "item010", "name": "部门奖励", "standard": "1. 主动提出并落地一个产品/活动流程优化，使项目周期缩短≥3天 → 加5分\n2. 主动整理出可复用的产品/活动SOP文档，被团队采纳 → 加5分\n3. 单月新品上市销量超出预期10%以上（因卖点优化贡献）→ 加5分", "maxScore": 0}, {"id": "item011", "name": "部门奖励", "standard": "月度内个人在工作中有突出表现或进行了额外的工作，可由其直接上级及部门负责人酌情给予一定加分", "maxScore": 0}]}]}, "市场部_市场运营": {"name": "市场部_市场运营", "versions": [{"version": "v1", "effectiveMonth": "2026-08", "note": "初始版本", "weights": {"self": 0.2, "supervisor": 0.6, "director": 0.2}, "categories": [{"name": "工作能力", "items": [{"id": "item001", "name": "文件整理与归档", "standard": "每月需整理的部门文件（合同、报告、产品资料、会议纪要等）在飞书按目录归档：\n- 完整率（应归档文件数/实际归档数）100% →10分，每缺1份扣1分\n- 及时率（规定时间内归档，收到文件后2个工作日内）≥95% → 5分，每低5%扣1分\n- 纸质文件原件分门别类放入文件夹中并妥善保管的完整率100%→ 5分，每低5%扣1分", "maxScore": 20.0}, {"id": "item002", "name": "费用审核与留档", "standard": "处理部门报销单（含活动费、差旅费、电商推广费、快递费等）：\n- 审核准确率（无错审、漏审、重复报销）100% → 10分，每发现1处错误扣1分\n- 所有报销凭证（发票、审批单、说明）完整留档并上传飞书 → 5分，每缺1份扣1分", "maxScore": 15.0}, {"id": "item003", "name": "市场调研", "standard": "每月至少提交1份《市场/竞品/用户调研报告》（比如分析1个竞品、1个趋势、1个用户洞察），次月8日前提交 → 5分，逾期0分；报告中有1条以上建议被产品决策采纳 ≥1条 → 额外+3分；每月至少针对在售老品提出优化建议（卖点升级-产品详情页/宣传内容、包装调整、成本降低、配方微调）≥1条 → 5分；其中被采纳并落地执行 ≥1条 → 额外加3分；未完成按比例扣分。", "maxScore": 10.0}, {"id": "item004", "name": "协助产品项目执行", "standard": "完成产品经理根据产品项目（优化、上新、开发）拆解出的协助任务（如收集样品、整理文档、跟进打样、协调测评等），共同保证产品部各项产品任务按时完成（研发、生产等外部节点不作为考核依据）：\n按时完成比例：X≥90% →10分；90%＞X≥80% → 8分；80＞X≥60% → 6分；X＜60% → 0分。", "maxScore": 10.0}, {"id": "item005", "name": "打样测评反馈", "standard": "每次打样后（根据实际情况）3个工作日内提交《测评反馈表》（含数据/感官评价、改进方向）反馈后跟进研发调试，直至样品确认，闭环率100% → 5分；每超时或未闭环扣2分。（以下情形除外：研发或供应商未反馈必要数据;样品本身问题导致无法闭环。）当月无打样测评则自动得5分。", "maxScore": 5.0}, {"id": "item006", "name": "产品资料维护", "standard": "针对公司所有产品，要定时按需将产品信息（产品信息、包装宣传图、卖点、相关报告、销售话术案例）整理为产品手册，每月至少整理2个产品于飞书；若当月有新上市产品，必须在上市前10天交付完整资料 →准确及时率100% → 20分，未整理一个产品扣10分，每缺1项扣1分。", "maxScore": 20.0}, {"id": "item007", "name": "市场培训", "standard": "若有销售团队培训需求，需100%及时响应（需求发出后1个工作日内响应并在规定时间内完成培训工作或相应安排）→ 5分，每出现1次未及时响应扣2分，扣完为止；当月无培训需求则自动得5分。", "maxScore": 5.0}, {"id": "item008", "name": "客诉问题", "standard": "每月收集到的老品问题（来自销售、客诉等）记录在案，并在约定周期内（如7天）给出解决方案并联系各部门进行沟通并执行：闭环率≥90% → 5分 ，X≥80% → 4分 ，X≥70% → 3分 ，X＜60% → 0分。", "maxScore": 5.0}, {"id": "item009", "name": "协助部门领导任务", "standard": "部门领导交办的工作事宜保证任务按时完成（除任务指令不明确或中途变更；任务依赖他人且已主动协调；任务交付后领导未及时确认以外 ）：\n- 按时完成率 ：X≥90% → 10分；90＞X≥80% → 8分；80＞X≥70% → 6分；70＞X≥60% → 4分，X＜60% → 0分。", "maxScore": 10.0}]}], "bonuses": [{"id": "item010", "name": "部门奖励", "standard": "1. 主动优化项目协助流程或行政流程，被产品经理采纳 → 加2分\n2. 发现并纠正历史错误（客诉漏跟、报销错误、发货差错等），为公司挽回损失≥500元 → 加3分", "maxScore": 0}, {"id": "item011", "name": "部门奖励", "standard": "月度内个人在工作中有突出表现或进行了额外的工作，可由其直接上级及部门负责人酌情给予一定加分", "maxScore": 0}]}]}, "内容部_内容主管": {"name": "内容部_内容主管", "versions": [{"version": "v1", "effectiveMonth": "2026-08", "note": "初始版本", "weights": {"self": 0.2, "supervisor": 0.6, "director": 0.2}, "categories": [{"name": "生产效率\n与交付", "items": [{"id": "item001", "name": "产出数量", "standard": "月度内容产出达成率=实际发布篇数 / 计划发布篇数 × 100%：\n实际合计发布篇数：                           ；计划合计发布篇数：                          \n- >120% → 加5分即20分\n- =100% → 15分\n- ≥85% → 12分\n- ≥70% → 9分\n- ≥55% → 6分\n-＜55% → 0分", "maxScore": 15.0}, {"id": "item002", "name": "互动量", "standard": "内容总互动量：点赞+评论+收藏+转发。\n- 互动量≥300 → 15分\n- 250≤互动量＜300 → 10分\n- 200≤互动量＜250 → 5分\n- 互动量≤200 → 0分", "maxScore": 15.0}, {"id": "item003", "name": "粉丝数量\n（新增长）", "standard": "月度新增粉丝数达成率=实际新增粉丝数 / 目标新增粉丝数 ×100%：\n本月实际新增粉丝数：                        ；目标新增粉丝数：                       \n完成率：                                  %，分数=完成率*10分", "maxScore": 10.0}, {"id": "item004", "name": "账号基础运维", "standard": "每日检查各平台账号矩阵状态、回复私信/评论，更新主页信息、监控竞品账号：全部按时高效100%完成 → 10分。", "maxScore": 10.0}, {"id": "item005", "name": "卖点穿透力", "standard": "① 月度主导并产出1篇深度种草长文（家清或牙膏）按时按量100%完成 → 15分，未完成得0分。若里面所产出的文案/金句/图片被其他博主/用户广泛引用（复用次数累计月均大于等于5次） → 额外+3分", "maxScore": 15.0}, {"id": "item006", "name": "团队管理", "standard": "① 每周召开周会，会后24h行动计划 → 5分，每缺1项扣0.5分，缺开1次扣1分                                                                                                         ② 团队成员提交的内容，需在4小时内完成审核反馈（工作日8:00-16:30内） → 5分，每超时1次扣1分，扣完为止。", "maxScore": 10.0}, {"id": "item007", "name": "SOP沉淀与复用", "standard": "每月至少更新1条SOP（优秀文案案例库、选题库、排版规范、爆款拆解、复盘模板），并对团队成员进行1次分享/培训：\n- 完成更新且分享 → 5分\n- 完成更新但无分享 → 3分\n- 未更新 → 0分", "maxScore": 5.0}, {"id": "item008", "name": "数据分析与复盘", "standard": "每月10日前提交《内容组运营月报》（含数据、爆款分析、竞品动态、下月策略）→ 10分，每推迟1天扣1分；报告中提出≥1条优化建议被上级采纳 → 额外+3分", "maxScore": 10.0}, {"id": "item009", "name": "素材管理", "standard": "每次本人的拍摄照片、模版文件需在7个工作日内按货号、文件标题名称标注归档至共享硬盘/云盘，每月抽查2条内容，归档完整率100% → 5分；每缺1项扣1分。", "maxScore": 5.0}, {"id": "item010", "name": "文案合规", "standard": "发布的内容中出现违禁词、广告法违规、错别字、负面引导公司形象每次扣2分；收到平台处罚或下架，此项直接0分并约谈。", "maxScore": 5.0}]}], "bonuses": [{"id": "item011", "name": "爆款奖励", "standard": "1. 单月内出大爆文（单篇自产小红书笔记互动超100；或公众号文章阅读量超1000；或合作达人笔记点赞超1000）→ 加5分\n2.建立可复用的爆款内容模板，被公司内容组工作采用 → 加2分\n3.单条内容带来GMV≥1000元 → 加5分", "maxScore": 0}, {"id": "item012", "name": "达人稿件审稿现金奖励", "standard": "在常规文案工作之外，额外承接达人稿件审核任务，按实际审核通过数量每份1元给予现金奖励（不计入积分）。", "maxScore": 0}, {"id": "item013", "name": "部门奖励", "standard": "月度内个人在工作中有突出表现或进行了额外的工作，可由其直接上级及部门负责人酌情给予一定加分。", "maxScore": 0}]}]}, "内容部_视频运营": {"name": "内容部_视频运营", "versions": [{"version": "v1", "effectiveMonth": "2026-08", "note": "初始版本", "weights": {"self": 0.2, "supervisor": 0.6, "director": 0.2}, "categories": [{"name": "生产效率\n与交付", "items": [{"id": "item001", "name": "产出数量", "standard": "月度视频产出达成率=实际视频产出数 / 计划产出视频数 × 100%：\n本月实际产出数量：                           ；本月产出数量目标                  \n- >120% → 加5分即20分\n- =100% → 15分\n- ≥85% → 12分\n- ≥70% → 9分\n- ≥55% → 6分\n-＜55% → 0分\n（注：同一条视频多平台分发只算1条产出）", "maxScore": 15.0}, {"id": "item002", "name": "播放量", "standard": "视频平均播放量目标达成率=实际单条平均播放量 /目标 × 100%：\n本月单条平均播放量：                    ；单条平均播放量目标：                  \n- 平均播放量达标率≥100% → 10分\n- 80%≤平均播放量达标率＜100% →8分\n- 60%≤平均播放量达标率＜80% →5分\n- 平均播放量达标率＜60% → 2分", "maxScore": 10.0}, {"id": "item003", "name": "互动量", "standard": "互动量=点赞+评论+收藏+转发\n- 互动量≥1000 → 10分\n- 800≤互动量＜1000 → 8分\n- 600≤互动量＜800  → 5分\n- 互动量≤600 → 2分", "maxScore": 10.0}, {"id": "item004", "name": "粉丝数量\n（新增长）", "standard": "月度粉丝增数达成率=实际新增粉丝数 / 目标新增粉丝数 ×100%：\n本月实际新增粉丝数：                        ；目标新增粉丝数：                \n- 新增粉丝数≥100%→10分（≥120%可额外+2分）\n- 70%≤新增粉丝数＜100%→7分\n- 50%≤新增粉丝数＜70%→5分\n- 新增粉丝数＜50%→3分", "maxScore": 10.0}, {"id": "item005", "name": "完播率", "standard": "1、月度平均视频完播率≥10%（5+2分）\n2、10%>月度平均视频完播率≥8%（5分）\n3、8%>月度平均视频完播率≥5%（3分）\n4、月度平均视频完播率<5%（2分）", "maxScore": 5.0}, {"id": "item006", "name": "紧急需求响应度", "standard": "运营/主管提出修改意见后，从接收修改需求到交付达标内容的平均时长：\nX≤5小时 → 5分；5＜X≤8小时 → 3分；X＞8小时 → 1分（若有特殊情况再议）", "maxScore": 5.0}, {"id": "item007", "name": "爆款率", "standard": "爆款定义：单条播放量≥5K。爆款率 = 爆款视频数 / 总发布视频数 × 100%：\n- 爆款率≥20% → 10+5分\n- 10%＜爆款率≤15% → 10分\n- 7%＜爆款率≤10% →7分\n-5%＜爆款率≤7% →5分\n- 爆款率≤5% →3分", "maxScore": 10.0}, {"id": "item008", "name": "账号维护与数据分析", "standard": "① 定期检查账号状态、回复私信/评论，处理账号负面信息、更新主页信息、监控竞品账号→ 5分；\n② 每月5日前提交《视频运营月报》（含各视频数据、问题分析、下月优化计划）→ 5分；每缺一项扣1分，每推迟1天扣1分。", "maxScore": 10.0}, {"id": "item009", "name": "团队协作", "standard": "协作各个部门完成照片/视频等拍摄（包含公司参观、企业活动、文体宣传等）；照片需在24小时内归档，发现一次归档不及时扣2分；", "maxScore": 10.0}, {"id": "item010", "name": "SOP沉淀", "standard": "每月至少更新1条SOP（如拍摄清单、剪辑流程、发布规范、爆款拆解模板）", "maxScore": 5.0}, {"id": "item011", "name": "设备与素材管理", "standard": "每次拍摄的原始素材、成片需在7个工作日内归档至共享硬盘/云盘，每月抽查5条视频，归档完整率100% → 5分；每缺1项扣1分。", "maxScore": 5.0}, {"id": "item012", "name": "版权与合规", "standard": "发布的视频中出现版权图片/音乐、违禁词、广告法违规、错别字、负面引导公司形象每次扣2分；收到平台处罚或下架，此项直接0分并约谈。", "maxScore": 5.0}]}], "bonuses": [{"id": "item013", "name": "爆款奖励", "standard": "主动对视频内容脚本\\剪辑\\拍摄进行优化或创新，并带来数据提升：\n- 视频播放量\\互动率\\涨粉率（其一）比账户平均值提升 ≥200% → 加5分\n- 单条视频带来GMV≥1000元 → 加5分\n- 视频内容被内部或客户主动表扬且复用率提升 → 加3分", "maxScore": 0}, {"id": "item014", "name": "部门奖励", "standard": "月度内个人在工作中有突出表现或进行了额外的工作，可由其直接上级及部门负责人酌情给予一定加分。", "maxScore": 0}]}]}, "内容部_内容运营": {"name": "内容部_内容运营", "versions": [{"version": "v1", "effectiveMonth": "2026-08", "note": "初始版本", "weights": {"self": 0.2, "supervisor": 0.6, "director": 0.2}, "categories": [{"name": "生产效率\n与交付", "items": [{"id": "item001", "name": "产品图文\n产出", "standard": "产品图文数量达成率=每月计划产出产品图文（用于小红书、公众号、电商详情页等）实际完成数 / 计划数 × 100%：\n本月实际产出数量：                           ；本月产出数量目标                  \n- =100% → 15分\n- ≥90% → 12分\n- ≥80% → 9分\n- ≥60% → 6分\n-＜60% → 0分\n（计划由内容主管月初下达）", "maxScore": 15.0}, {"id": "item002", "name": "产品图文\n质量", "standard": "公众号、小红书等平台图文一次性过审率=主管审核图文时，无需修改直接通过的比例（侵权）：\n- ≥90% → 10分\n- ≥85% → 8分\n- ≥80% → 6分\n- ≥75% → 4分\n- ＜75% → 0分\n若当月出现任何因侵权问题（包括但不限于图片版权、字体侵权、肖像权未授权、文案抄袭等）导致的修改或下架，无论最终是否通过，该项绩效直接判定为0分，并记录事故。", "maxScore": 10.0}, {"id": "item003", "name": "场景内容照片压字图", "standard": "压字图产出完成率=每月计划压字图（场景照片+文案压字）实际完成数 / 计划数 × 100%：\n本月实际产出数量：                           ；本月产出数量目标                  \n- =100% → 15分\n- ≥90% → 12分\n- ≥80% → 9分\n- ≥60% → 6分\n-＜60% → 0分\n（计划由内容主管月初下达）", "maxScore": 15.0}, {"id": "item004", "name": "公众号文章排版与发布", "standard": "① 按时发布率：按主管给定的发布时间（精确到小时）发布的比例 100% → 8分，每超时1次扣3分；\n② 排版错误率：每月发布文章中，因排版失误（格式错乱、错别字、链接错误、图片错位等）被主管指出需修正的篇数 ≤ 1篇 → 7分；每多1篇扣2分，扣完为止", "maxScore": 15.0}, {"id": "item005", "name": "私域群日常运营", "standard": "① 每日检查所负责私域群，完成群公告更新、群内日常互动（至少1次/日）→ 3分，每缺1天扣1分\n② 群内用户提问在2小时内回复率 ≥95% → 3分，每低5%扣2分\n③ 每周至少发起1次群内互动活动（如话题讨论、福利发放、投票等），并提供截图证明 → 4分，每缺1周扣2分", "maxScore": 10.0}, {"id": "item006", "name": "自主内容研究与复用", "standard": "每周至少研究3个竞品/同行账号（小红书、公众号等），提炼出可复用的营销内容点（产品图形式、种草文案结构、用户痛点话术、标题套路等），并形成《竞品可复用内容周报》提交主管：\n- 每月按时提交4份周报，且累计提炼出≥6条有效复用建议（被主管认可）→ 10分\n- 提交4份周报，有效建议4-5条 → 8分\n- 提交3份周报，有效建议≥3条 → 6分\n- 提交2份周报 → 3分\n- 提交≤1份或0条有效建议 → 0分", "maxScore": 10.0}, {"id": "item007", "name": "团队协作", "standard": "主管交办任务按时完成率：领导交办的非计划内任务（如协助拍摄、素材收集、竞品整理等），以书面任务清单为准，按时完成率：\n- 100% → 15分\n- ≥95% → 13分\n- ≥90% → 10分\n- ≥85% → 7分\n- ＜85% → 0分", "maxScore": 15.0}, {"id": "item008", "name": "素材归档与协作", "standard": "每月所有产出的图文、压字图源文件（原图/成品图及可编辑文件）需在完成后2个工作日内归档至共享云盘，抽查10个文件，归档完整率100% → 5分；每缺1个扣0.5分，扣完为止", "maxScore": 5.0}, {"id": "item009", "name": "版权与合规", "standard": "发布的图文、压字图、公众号文章中出现违禁词、字体/图片侵权，每次扣2分；收到平台处罚或警告，此项直接0分并约谈", "maxScore": 5.0}]}], "bonuses": [{"id": "item010", "name": "爆款奖励", "standard": "1. 主动优化排版模板、拍摄场景或图文设计，被其他同事、业务员表扬或被主管采纳为团队SOP 或直接产出销售数据＞500元→ 加2分\n2. 提出私域群运营创新玩法，使群内周活跃率（发言人数/总人数）提升10%以上 → 加3分", "maxScore": 0}, {"id": "item011", "name": "部门奖励", "standard": "月度内个人在工作中有突出表现或进行了额外的工作，可由其直接上级及部门负责人酌情给予一定加分。", "maxScore": 0}]}]}, "设计部_美工": {"name": "设计部_美工", "versions": [{"version": "v1", "effectiveMonth": "2026-08", "note": "初始版本", "weights": {"self": 0.2, "supervisor": 0.6, "director": 0.2}, "categories": [{"name": "考核项", "items": [{"id": "item002", "name": "任务完成率", "standard": "月度设计任务完成率 = 实际完成设计任务数 / 计划任务数 × 100%（任务以运营下达的工作需求为准），X ≥100% → 20分；≥95% → 18分；≥90% → 15分；≥85% → 12分；≥80% → 8分；＜80% → 0分", "maxScore": 20.0}, {"id": "item003", "name": "交付及时率", "standard": "每项任务在约定交付时间内或不超时2小时内交付算按时交付，按时交付数量 / 总任务数 × 100%：X ≥100% → 20分；≥95% → 18分；≥90% → 15分；≥85% → 12分；≥80% → 8分；＜80% → 0分", "maxScore": 20.0}, {"id": "item004", "name": "设计通过率", "standard": "一次过审率（免返工）=任务提交后无需修改即被运营/主管通过的数量 / 总任务数 × 100%：X ≥85% → 20分；≥80% → 18分；≥70% → 15分；≥60% → 10分；＜60% → 0分", "maxScore": 20.0}, {"id": "item005", "name": "返工/修改次数", "standard": "返工率 = 因美工失误（尺寸错误、文案错字、格式不符等）导致的修改次数 / 总任务数 × 100%：X≤5% → 10分，5＜X≤10% → 7分，10＜X≤20% → 4分，X＞20% → 0分", "maxScore": 10.0}, {"id": "item006", "name": "紧急任务响应", "standard": "运营下达紧急任务（如临时活动海报、热点追图），需在≤3小时内完成交付。当月紧急任务总数中的及时完成率：X ≥100% →10分；100＞X≥80% → 8分；80＞X≥60% → 6分；X＜60% → 0分", "maxScore": 10.0}, {"id": "item007", "name": "修改响应速度", "standard": "运营/主管提出修改意见后，从接收修改需求到交付修改稿的平均时长：\nX≤2小时 → 5分；2＜X≤4小时 → 3分；4＜X≤8小时 → 1分；X＞8小时 → 0分", "maxScore": 5.0}, {"id": "item008", "name": "需求理解与卖点传达", "standard": "每月随机抽查10个设计任务，对照上级提出的设计需求中的核心要求（例如产品卖点、文案、风格、尺寸等）：\n- 完全符合要求（无遗漏） → 10分\n- 每发现1处遗漏或错误 → 扣1分，扣完为止", "maxScore": 10.0}, {"id": "item009", "name": "设计合规与产品卖点准确率", "standard": "出现以下任一情况，每次扣2分：字体/图片素材侵权；抄袭他人设计；未检查出违禁词；产品卖点与运营提供的文案或者实际情况严重不符；情节严重（收到平台处罚或法律函）则此项直接0分并另约谈。", "maxScore": 5.0}]}], "bonuses": [{"id": "item010", "name": "主动设计优化", "standard": "在不增加运营要求的情况下，主动对新媒体设计进行优化或创新，并带来数据提升：\n- 新媒体笔记点击率提升 ≥15% → 加5分\n- 物料被内部或客户主动表扬且复用率提升 → 加5分", "maxScore": 0}, {"id": "item011", "name": "部门奖励", "standard": "月度内个人在工作中有突出表现或进行了额外的工作，可由其直接上级及部门负责人酌情给予一定加分。", "maxScore": 0}]}]}, "电商部_电商运营": {"name": "电商部_电商运营", "versions": [{"version": "v1", "effectiveMonth": "2026-08", "note": "初始版本", "weights": {"self": 0.2, "supervisor": 0.6, "director": 0.2}, "categories": [{"name": "客观评分", "items": [{"id": "item001", "name": "销售额GMV", "standard": "完成月度销售目标，考核目标完成率。本月销售目标：                  万元\n本月实际销售额：                    万元 ，GMV达成率：             %\nX≥90% → 30分，80%≤X＜90% → 28分，70%≤X＜80% → 26分，60%≤X＜70% → 24分，50%≤X＜60% → 22分，X<50% → 15分。", "maxScore": 30.0}, {"id": "item002", "name": "转化能力", "standard": "转化率 = 下单人数 / 店铺总访客数 × 100%，目标值根据历史及行业设定。\n转化率目标：              %，实际转化率             %，转化率达成率：              % X≥90% → 10分，80%≤X＜90% → 8分，70%≤X＜80% → 6分，60%≤X＜70% → 4分，50%≤X＜60% → 2分，X<50%→ 0分。", "maxScore": 10.0}, {"id": "item003", "name": "流量规模", "standard": "本月UV目标：                    ，本月实际UV：                    \n店铺总访客数UV达成率：             %\nX≥90% → 10分，80%≤X＜90% → 8分，70%≤X＜80% → 6分，60%≤X＜70% → 4分，50%≤X＜60% → 2分，X<50%→ 0分。", "maxScore": 10.0}, {"id": "item004", "name": "推广效率", "standard": "本月ROI目标：         ，实际投放ROI：            ，与上月比较为：上升/下降\nROI达成率：             %\nX≥90% → 10分，80%≤X＜90% → 8分，70%≤X＜80% → 6分，60%≤X＜70% → 4分，50%≤X＜60% → 2分，X<50%→ 0分。", "maxScore": 10.0}, {"id": "item005", "name": "库存协同", "standard": "缺货次数：因未及时备货、未提前30天提供大促预计要货数量而导致热销品断货≥24小时，每次扣1分，上限5分。", "maxScore": 5.0}, {"id": "item006", "name": "售后与评价", "standard": "本月店铺DSR评分（描述相符+服务态度+物流服务）：                  分\nDSR ≥4.8 → 10分；4.8＞DSR≥4.6 → 8分；4.6＞DSR≥4.4 → 6分，4.4＞DSR≥4.2 → 4分 ；DSR＜4.2 → 0分", "maxScore": 10.0}, {"id": "item007", "name": "退货率", "standard": "本月店铺退货率：            ，与上月比较为：上升/下降。退货率 ≤ 5% 且 差评率 ≤ 2% 得5分，每项每超0.5%扣1分，扣完为止。", "maxScore": 5.0}, {"id": "item008", "name": "目标制定", "standard": "每周一下午前提交《周报》 → 每周准时提交得4分，逾期一次扣1分；每月15日前提交《月报》→每月准时交得4分，逾期或不交扣4分。", "maxScore": 8.0}, {"id": "item009", "name": "计划执行", "standard": "促销活动、新品上架、会员活动等需要严格遵守价格体系，每次发现破价行为且1天内未实施改正行为扣2分；任何费用、活动等流程需要规范执行OA申请，每次发现有费用自扣未报备或破价促销行为未报备扣2分。", "maxScore": 8.0}, {"id": "item010", "name": "客户关系维护", "standard": "会员粉丝群互动：每月群内有效活动≥2次，每项不达标扣2分", "maxScore": 4.0}]}], "bonuses": [{"id": "item011", "name": "策略优化", "standard": "1. GMV超过目标20%以上 → 加3分\n2. 成功策划并落地一次平台大促活动，活动期GMV同比提升≥30% → 加4分\n3. 开发新流量渠道，单月带来新增UV≥5000且ROI≥2 → 加3分\n4. 提出并实施一项降本增效策略（如包装优化、快递谈判、ERP自动化）→ 加3分", "maxScore": 0}, {"id": "item012", "name": "部门奖励", "standard": "月度内个人在工作中有突出表现或进行了额外的工作，可由其直接上级及部门负责人酌情给予一定加分。", "maxScore": 0}]}]}, "电商部_控价运营": {"name": "电商部_控价运营", "versions": [{"version": "v1", "effectiveMonth": "2026-08", "note": "初始版本", "weights": {"self": 0.2, "supervisor": 0.6, "director": 0.2}, "categories": [{"name": "客观评分", "items": [{"id": "item001", "name": "乱价核查覆盖率", "standard": "每日对主要平台（淘宝、拼多多、抖音等）按品牌核心关键词（家清、口腔）搜索，并进行巡查低价链接。\n- 实际巡查链接数 / 任务量 × 100%：≥100% → 10分\n- ≥95% → 8分\n- ≥90% → 6分\n- ≥85% → 4分\n- ＜85% → 0分", "maxScore": 10.0}, {"id": "item002", "name": "乱价处理有效率", "standard": "本月发现的乱价链接数：                    ，本月成功管控的链接数：                    \n当月发现的乱价链接中，通过自主投诉或协调业务员后，成功改价或下架的比例：\n- ≥90% → 15分\n- ≥80% → 12分\n- ≥70% → 9分\n- ≥60% → 6分\n- ＜60% → 0分", "maxScore": 15.0}, {"id": "item003", "name": "控价台账管理", "standard": "每月需维护《控价台账》（含链接、发现时间、处理状态、结果、责任人以及后续巡回核查）：\n- 台账记录完整（无缺项）→ 4分，每缺1条记录扣0.5分\n- 每条乱价处理进度一周更新一次，但需每天巡查，如发现价格未达到控价要求需写明 → 4分，每发现1次超时扣1分", "maxScore": 10.0}, {"id": "item004", "name": "供应商及业务员联动", "standard": "对发现的乱价，需在5个工作日内查明供货来源（通过与供应商/经销商/业务员沟通）并通知对应业务员跟进（以下情形除外：相关部门不配合或其他非个人能力问题而导致无法溯源）：\n- 溯源完成率 ≥95% → 3分，每低5%扣1分\n- 通知业务员及时率（24小时内）100% → 2分，每超时1次扣1分", "maxScore": 5.0}, {"id": "item005", "name": "客户线上官方授权对接", "standard": "① 收到客户授权申请后，2个工作日内完成初步对接 → 2分，每超时1次扣1分\n② 针对有记录的客户授权，进行档案信息规整（客户名称、平台、授权链接、有效期）完整率100% → 2分，每缺1项扣0.5分\n③ 每月对所有已授权的线上店铺进行至少一次价格核查→ 6分，每缺1项扣0.5分", "maxScore": 10.0}, {"id": "item006", "name": "淘工厂/国货严选渠道运营", "standard": "完成月度销售目标，考核目标完成率。\n本月销售目标：                    万元\n本月实际销售额：                    万元 ，GMV达成率：                    %\nX≥90% → 30分，80%≤X＜90% → 28分，70%≤X＜80% → 26分，60%≤X＜70% → 24分，50%≤X＜60% → 22分，X<50% → 15分。", "maxScore": 30.0}, {"id": "item007", "name": "合规与客诉", "standard": "因价格管控不当（如误伤合规经销商、授权遗漏等）引起客户投诉，经核实每次扣2分，扣完为止", "maxScore": 5.0}, {"id": "item008", "name": "官方店铺控价", "standard": "若公司官方店铺出现乱价情况，需在1个工作日内通知整改到位，如果收到其他业务员/客户反馈，经合核实每次扣2分，扣完为止", "maxScore": 5.0}, {"id": "item009", "name": "目标制定", "standard": "每周一下午前提交《周报》 → 每周准时提交得2分，逾期一次扣1分；每月15日前提交《月报》→每月准时交得2分，逾期或不交扣4分。", "maxScore": 4.0}, {"id": "item010", "name": "计划执行", "standard": "促销活动、新品上架、会员活动等需要严格遵守价格体系，每次发现破价行为且1天内未实施改正行为扣2分；任何费用、活动等流程需要规范执行OA申请，每次发现有费用自扣未报备或破价促销行为未报备扣2分。", "maxScore": 6.0}]}], "bonuses": [{"id": "item011", "name": "策略优化", "standard": "1. GMV超过目标20%以上 → 加3分\n2. 月控价处理成功率 ≥95%（且无合规投诉）→ 加2分\n3. 开发新流量渠道，单月带来新增UV≥5000且ROI≥2 → 加3分", "maxScore": 0}, {"id": "item012", "name": "部门奖励", "standard": "月度内个人在工作中有突出表现或进行了额外的工作，可由其直接上级及部门负责人酌情给予一定加分。", "maxScore": 0}]}]}, "电商部_电商美工": {"name": "电商部_电商美工", "versions": [{"version": "v1", "effectiveMonth": "2026-08", "note": "初始版本", "weights": {"self": 0.2, "supervisor": 0.6, "director": 0.2}, "categories": [{"name": "考核项", "items": [{"id": "item002", "name": "任务完成率", "standard": "月度设计任务完成率 = 实际完成设计任务数 / 计划任务数 × 100%（任务以运营下达的工作需求为准），X ≥100% → 25分；≥95% →20分；≥90% → 15分；≥85% → 12分；≥80% → 8分；＜80% → 0分", "maxScore": 25.0}, {"id": "item003", "name": "交付及时率", "standard": "每项任务在约定交付时间内或不超时2小时内交付算按时交付，按时交付数量 / 总任务数 × 100%：X ≥100% → 20分；≥95% → 18分；≥90% → 15分；≥85% → 12分；≥80% → 8分；＜80% → 0分", "maxScore": 20.0}, {"id": "item004", "name": "设计通过率", "standard": "一次过审率（免返工）=任务提交后无需修改即被运营/主管通过的数量 / 总任务数 × 100%：X ≥85% → 20分；≥80% → 18分；≥70% → 15分；≥60% → 10分；＜60% → 0分", "maxScore": 20.0}, {"id": "item005", "name": "返工/修改次数", "standard": "返工率 = 因美工失误（尺寸错误、文案错字、格式不符等）导致的修改次数 / 总任务数 × 100%：X≤5% → 10分，5＜X≤10% → 7分，10＜X≤20% → 4分，X＞20% → 0分", "maxScore": 10.0}, {"id": "item006", "name": "紧急任务响应", "standard": "运营下达紧急任务（如大促临时改图），需在≤3小时内完成交付。当月紧急任务总数中的及时完成率：X ≥100% →5分；100＞X≥80% → 3分；80＞X≥60% → 1分；X＜60% → 0分", "maxScore": 5.0}, {"id": "item007", "name": "设计效果 – 主图点击率", "standard": "当月新上架主图（或优化后主图）点击率需达到同类目平均水平的85%以上。达标任务数 / 新上架主图总数 × 100%：X≥85% → 5分，85＞X≥60% → 3分，X＜60% → 0分（点击率数据取自电商后台）", "maxScore": 5.0}, {"id": "item008", "name": "设计效果 – 详情页转化贡献", "standard": "对比改版前后详情页的平均停留时长或跳出率。每月选取2个重点优化链接评估：\n- 平均停留时长提高或跳出率降低 ≥3% → 5分\n- 平均停留时长提高或跳出率降低 ≥1% → 3分\n- 平均停留时长降低或跳出率变差 ＜1%→ 0分", "maxScore": 5.0}, {"id": "item009", "name": "设计合规与产品卖点准确率", "standard": "出现以下任一情况，每次扣2分：字体/图片素材侵权；抄袭他人设计；未检查出违禁词；产品卖点与运营提供的文案或者实际情况严重不符；情节严重（收到平台处罚或法律函）则此项直接0分并另约谈。", "maxScore": 10.0}]}], "bonuses": [{"id": "item010", "name": "直播策略优化", "standard": "在不增加运营要求的情况下，主动对现有素材（主图/详情/车图/视频）进行A/B测试或改版，并带来数据提升：\n- 主图点击率提升 ≥15% → 加3分\n- 详情页转化率提升 ≥10% → 加3分\n- 推广图点击率提升 ≥20% → 加3分\n- 同时达成两项以上 → 加8分\n- 单项提升特别显著（点击率翻倍） → 加5分", "maxScore": 0}, {"id": "item011", "name": "部门奖励", "standard": "月度内个人在工作中有突出表现或进行了额外的工作，可由其直接上级及部门负责人酌情给予一定加分。", "maxScore": 0}]}]}, "电商部_电商主播": {"name": "电商部_电商主播", "versions": [{"version": "v1", "effectiveMonth": "2026-08", "note": "初始版本", "weights": {"self": 0.3, "supervisor": 0.5, "director": 0.2}, "categories": [{"name": "考核项", "items": [{"id": "item002", "name": "销售业绩", "standard": "当月直播销售额：                       元，当月直播销售目标：  7000  元\n当月业绩目标达到100%-35分；95%及以上-33分；90%及以上-30分；85%及以上-28分；80%及以上-25分；70%及以上-23分；60%及以上-20分；50%及以上-15分；未达到50%-0分。", "maxScore": 35.0}, {"id": "item003", "name": "直播时长", "standard": "当月上播时长共计：               小时，当月约定直播时长：   120  小时\n当月有效直播时长达成率100%得15分，达成率达到90%及以上得13分，达成率达到80%及以上得10分，达成率达到60%及以上得5分，达成率低于60%得0分。（约定直播时长根据当月实际工作情况可以调整，以主播本人与上级双方确认为准）", "maxScore": 20.0}, {"id": "item004", "name": "转化能力", "standard": "转化率 = 下单人数 / 直播间观看人数 × 100%，当月转化率=                %\n转化率≥4%得15+2分，3%≤转化率＜4%得15分，2%≤转化率＜3%得12分，1%≤转化率＜2%得10分，转化率＜1%得0分。", "maxScore": 15.0}, {"id": "item005", "name": "流量效果", "standard": "当月直播间观看人次（UV）：                ，目标UV：    4400   人次\n当月UV目标达到100%-10分；90%及以上-9分；80%及以上-8分；70%及以上-7分；60%及以上-6分；50%及以上-5分；未达到50%-0分。", "maxScore": 10.0}, {"id": "item006", "name": "粉丝增长", "standard": "当月实际新增粉丝：                人，目标新增粉丝：     50     人\n当月粉丝增长目标达到100%-10分；90%及以上-9分；80%及以上-8分；70%及以上-7分；60%及以上-6分；50%及以上-5分；未达到50%-0分。", "maxScore": 10.0}, {"id": "item007", "name": "直播合规", "standard": "若因不当话术、违禁词、个人形象问题等被平台警告或扣分，或者产品介绍错误导致消费者投诉的情况，每次扣5分，扣完为止。", "maxScore": 10.0}]}], "bonuses": [{"id": "item008", "name": "直播策略优化", "standard": "每月提出并落地一项可量化的优化动作（如话术调整、排品顺序、互动玩法、引流方式。向上级汇报且前后数据对比，带来以下效果之一：\n- 转化率提升 ≥0.5% → 额外加3分\n- UV提升 ≥10% → 额外加3分\n- GMV提升 ≥8% → 额外加5分\n- 同时达成两项以上 → 额外加8分", "maxScore": 0}, {"id": "item009", "name": "部门奖励", "standard": "月度内个人在工作中有突出表现或进行了额外的工作，如协助视频组拍摄视频超过3条及以上，额外加3分；若拍摄视频8条及以上，额外加5分；若拍摄视频12条及以上，额外加10分。", "maxScore": 0}]}]}, "电商仓_仓库主管": {"name": "电商仓_仓库主管", "versions": [{"version": "v1", "effectiveMonth": "2026-08", "note": "初始版本", "weights": {"self": 0.2, "supervisor": 0.6, "director": 0.2}, "categories": [{"name": "工作能力", "items": [{"id": "item001", "name": "批次管理", "standard": "遵循货品先进先出原则，临期产品设置预警，提醒电商运营促销。(每月抽查，执行率＞95%得10分，＞90%得8分，≥80%得6分，＜80%得0分）", "maxScore": 10.0}, {"id": "item002", "name": "库存准确率", "standard": "考察每月库存准确率。（每月抽查，准确率＞99%得10分，＞98%得8分，≥95%得6分，＞90%得4分，≤90%得0分)", "maxScore": 10.0}, {"id": "item003", "name": "库位管理", "standard": "做到标识准确，每日对库存条件以及物品摆放进行检查督促，发现问题及时纠正。(每月随机抽查20个库位，规范率100%得8分，每发现1处不规范扣1分，扣完为止)", "maxScore": 8.0}, {"id": "item004", "name": "库存预警与备货", "standard": "确保每一个SKU货品充足，合理设置低库存预警，如有爆单情况须提前备货。（因主管未及时预警或备货导致电商库存不足，每次扣2分，扣完为止，0分封底）", "maxScore": 10.0}, {"id": "item005", "name": "盘点", "standard": "每月25号前完成盘点并与K3同步得4分；盘点差异在3个工作日内与电商、财务确认完毕得4分，否则每项扣2分。", "maxScore": 10.0}, {"id": "item006", "name": "退货处理", "standard": "每天处理当日退货，避免退货区货物堆积。当日退货处理率（月均值） 月均值=100%得10分，≥98%得8分，≥95%得6分，＜95%得0分。", "maxScore": 10.0}, {"id": "item007", "name": "虚拟仓管理", "standard": "做到对虚拟仓库存负责，及时提醒电商运营虚拟仓库存数量。 每月抽查虚拟仓单据，准确率100%得8分，每发现1笔错误扣1分，扣完为止。", "maxScore": 8.0}, {"id": "item008", "name": "换包装提示", "standard": "因未及时提醒电商运营包装变更，导致客户投诉且确为主管责任，每次扣1分，扣完为止。", "maxScore": 8.0}, {"id": "item009", "name": "仓库卫生与5S", "standard": "针对仓库卫生及5S管理条例，每周检查一次（共4次），平均得分率≥95%得6分，≥90%得4分，≥85%得2分，＜85%得0分。", "maxScore": 8.0}, {"id": "item010", "name": "ERP核心功能熟练度", "standard": "每月随机抽查3个核心作业场景（如：策略创建与执行、预包/爆款打单、异常订单处理、库存同步设置、货位绑定），主管需独立操作演示。每失败1个场景扣2分，扣完为止。", "maxScore": 8.0}, {"id": "item011", "name": "系统数据驱动效率提升", "standard": "每月利用ERP系统功能，针对仓库工作现状，提出仓库效率诊断报告，并落地至少1项改进动作（如：调整爆品货位、合并低频订单波次）。报告+改进落地且带来拣货效率提升≥5%得10+5分；报告+改进落地但效率提升＜5%得10分；仅报告无改进得5分；无任何建议及反馈得0分。", "maxScore": 15.0}]}], "bonuses": [{"id": "item012", "name": "部门奖励", "standard": "月度内个人在工作中有突出表现或进行了额外的工作，可由其直接上级及部门负责人酌情给予一定加分。", "maxScore": 0}]}]}, "电商仓_打单员": {"name": "电商仓_打单员", "versions": [{"version": "v1", "effectiveMonth": "2026-08", "note": "初始版本", "weights": {"self": 0.2, "supervisor": 0.6, "director": 0.2}, "categories": [{"name": "工作能力", "items": [{"id": "item001", "name": "订单时效", "standard": "当日16:00之前的订单应全部打单完成。（按月计算，平均每日及时打单订单率100%为20分，其中有1%-5%订单未当日及时打单为15分；6%-10%订单未当日及时打单为10分；若平均每日及时打单订单率低于90%，则为0分。特殊营销大促除外）", "maxScore": 20.0}, {"id": "item002", "name": "错打率", "standard": "考察因打单失误而导致的错发率，错发率=错发单数/总订单数*100% 。(≤0.5%为20分，<1%为 18分，≤1.5%为15分，<2%为10分，>2%为0分）", "maxScore": 20.0}, {"id": "item003", "name": "盘点执行", "standard": "每月(含)25号之前需盘点一次库存和K3金蝶软件同步数据，25号-28号之间完成工作得10分，28号之后未盘点当月库存的，此项为0分。", "maxScore": 15.0}, {"id": "item004", "name": "ERP操作准确率", "standard": "每月随机抽查15笔打单操作记录（包括：审单、合并/拆分订单、面单模板选择、打印批次设置等）：准确率100% → 15分；每发现1次操作错误 → 扣1分，扣完为止。", "maxScore": 15.0}, {"id": "item005", "name": "物流异常跟踪处理", "standard": "每日需在通过物流监控功能中处理异常（如揽收超时、物流停滞、退回）：\n- 异常件在发现后5小时内处理完毕的比例 ≥98% → 10分\n- 异常件在发现后5小时内处理完毕的比例≥95% → 8分\n- 异常件在发现后5小时内处理完毕的比例≥90% → 5分\n- 异常件在发现后5小时内处理完毕的比例<90% → 0分", "maxScore": 10.0}, {"id": "item006", "name": "日常数据报表", "standard": "每日下班前提交《发货日报》（含平台、单量、异常单数、打单批次等）：\n- 当月100%按时、准确提交 → 10分\n- 每缺失1天或发现1处数据错误 → 扣1分，扣完为止", "maxScore": 10.0}, {"id": "item007", "name": "打单策略主动优化", "standard": "每月利用ERP后台提出并落地至少1项打单相关优化（如调整面单模板等），需向仓库主管沟通优化方案：\n- 有优化且效果，且实施后量化有效（省钱+省时） → 10+5分\n- 有主动提出优化方法，但实施后没有效果→ 10+2分\n- 有主动提出优化方法，但未实施→ 10分\n- 无优化动作但严格执行打单策略 → 8分\n- 无优化动作且没有主动采取正确的打单策略 → 0分", "maxScore": 10.0}]}], "bonuses": [{"id": "item008", "name": "部门奖励", "standard": "月度内个人在工作中有突出表现或进行了额外的工作，可由其直接上级及部门负责人酌情给予一定加分。", "maxScore": 0}]}]}, "电商仓_配货员": {"name": "电商仓_配货员", "versions": [{"version": "v1", "effectiveMonth": "2026-08", "note": "初始版本", "weights": {"self": 0.2, "supervisor": 0.6, "director": 0.2}, "categories": [{"name": "工作能力", "items": [{"id": "item001", "name": "发货时效", "standard": "（特殊营销大促除外）应做到当日分配给自己的面单全部发出（当日已打面单全部发出）为25分；每有1天不及时发货扣2分，扣完为止（例如：1天不及时→23分，2天→21分，3天→19分，超过3天→0分）。", "maxScore": 25.0}, {"id": "item002", "name": "错发率", "standard": "考察因配货员看错、包错、漏发而导致的错法率，错发率=错发单数/总订单数*100% （- ≤0.5% → 25分，≤1% → 23分，≤1.5% → 20分，≤2% → 15分，>2% → 0分）。", "maxScore": 25.0}, {"id": "item003", "name": "因包装不当导致的破损/漏液率", "standard": "破损/漏液率 = 责任破损件数 / 总发货件数 × 100%\n0% → 15分、≤0.1% → 12分、≤0.3% → 8分、>0.3% → 0分\n（若因操作不当造成严重损失，除扣分外另按公司规定赔偿）", "maxScore": 15.0}, {"id": "item004", "name": "打包作业符合率", "standard": "每月由仓库主管随机抽查10个包裹，检查：①纸箱/气泡袋使用是否合理（不浪费、不过度）；②包裹美观、封箱规范；③轻拿轻放无暴力操作。每发现1个包裹不合格扣1分；扣完为止。", "maxScore": 10.0}, {"id": "item005", "name": "每周5S检查得分率", "standard": "每周检查一次个人负责区域（共4次），平均得分率：\n ≥95% → 10分， ≥90% → 8分，≥85% → 6分，<85% → 0分", "maxScore": 10.0}, {"id": "item006", "name": "服从发货策略及工作安排", "standard": "每月由主管记录：是否按ERP系统推荐的拣货路径/波次策略执行（如：按波次拣货、使用PDA扫描等）\n- 是否无正当理由拒绝或擅自改变系统策略\n- 是否拒绝主管合理工作安排（如调整岗位、学习新流程）\n每发生1次不配合行为扣3分，扣完为止。", "maxScore": 15.0}]}], "bonuses": [{"id": "item007", "name": "部门奖励", "standard": "月度内个人在工作中有突出表现或进行了额外的工作：\n如：每月提交一项可量化的配货/打包优化建议（改变货位布局、优化包材选取规则、改进拿货动线等），经主管验证并采纳后：\n效果一般（效率提升5%~10%或成本节省≥100元/月） → 加3分；效果显著（效率提升≥10%或成本节省≥500元/月） → 加5分；多项优化可累计，但每月加分不超过10分", "maxScore": 0}]}]}}};
+
+let appData = null;
+let currentMonth = null;
+let currentPage = 'dashboard';
+let charts = {};
+
+function loadData() {
+  const saved = localStorage.getItem('xuebao_performance_data');
+  if (saved) {
+    try {
+      const local = JSON.parse(saved);
+      appData = {};
+      // 模板总是使用最新版本（随HTML更新）
+      appData.templates = DEFAULT_DATA.templates;
+      // 员工优先使用本地修改，没有则用默认
+      appData.employees = local.employees || DEFAULT_DATA.employees;
+      // 月度评分数据从本地加载
+      appData.monthlyData = local.monthlyData || {};
+    } catch(e) {
+      appData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+      appData.monthlyData = {};
+    }
+  } else {
+    appData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+    appData.monthlyData = {};
+  }
+}
+
+function saveData() {
+  localStorage.setItem('xuebao_performance_data', JSON.stringify(appData));
+  syncToCloud();
+}
+
+function getMonthData(month) {
+  if (!appData.monthlyData[month]) {
+    appData.monthlyData[month] = {};
+  }
+  return appData.monthlyData[month];
+}
+
+function getEmpScore(month, empId) {
+  const md = getMonthData(month);
+  if (!md[empId]) {
+    md[empId] = { items: {}, bonuses: {} };
+  }
+  return md[empId];
+}
+
+// 根据岗位和考核月份获取对应版本的模板
+function getTemplate(templateKey, month) {
+  const tpl = appData.templates[templateKey];
+  if (!tpl) return null;
+  if (!tpl.versions || tpl.versions.length === 0) return tpl;
+  // 找到effectiveMonth <= month的最新版本
+  const valid = tpl.versions.filter(v => v.effectiveMonth <= month);
+  if (valid.length === 0) return tpl.versions[0];
+  return valid[valid.length - 1];
+}
+
+function calcEmpScore(emp, month) {
+  const template = getTemplate(emp.templateKey, month);
+  if (!template) return { total: 0, selfTotal: 0, supTotal: 0, dirTotal: 0, itemScores: [] };
+  const w = template.weights;
+  const score = getEmpScore(month, emp.id);
+  let selfTotal = 0, supTotal = 0, dirTotal = 0, total = 0;
+  const itemScores = [];
+  
+  template.categories.forEach(cat => {
+    cat.items.forEach(item => {
+      const s = score.items[item.id] || {};
+      const sv = parseFloat(s.self) || 0;
+      const uv = parseFloat(s.supervisor) || 0;
+      const dv = parseFloat(s.director) || 0;
+      const weighted = sv * w.self + uv * w.supervisor + dv * w.director;
+      selfTotal += sv;
+      supTotal += uv;
+      dirTotal += dv;
+      total += weighted;
+      itemScores.push({ ...item, self: sv, supervisor: uv, director: dv, weighted: Math.round(weighted*100)/100 });
+    });
+  });
+  
+  template.bonuses.forEach(item => {
+    const s = score.bonuses[item.id] || {};
+    const sv = parseFloat(s.self) || 0;
+    const uv = parseFloat(s.supervisor) || 0;
+    const dv = parseFloat(s.director) || 0;
+    const weighted = sv * w.self + uv * w.supervisor + dv * w.director;
+    selfTotal += sv;
+    supTotal += uv;
+    dirTotal += dv;
+    total += weighted;
+    itemScores.push({ ...item, self: sv, supervisor: uv, director: dv, weighted: Math.round(weighted*100)/100, isBonus: true });
+  });
+  
+  return {
+    total: Math.round(total * 100) / 100,
+    selfTotal: Math.round(selfTotal * 100) / 100,
+    supTotal: Math.round(supTotal * 100) / 100,
+    dirTotal: Math.round(dirTotal * 100) / 100,
+    itemScores,
+    weights: w
+  };
+}
+
+function getEmpStatus(emp, month) {
+  const template = getTemplate(emp.templateKey, month);
+  if (!template) return { self: false, supervisor: false, director: false, all: false };
+  const score = getEmpScore(month, emp.id);
+  const allItems = [...template.categories.flatMap(c => c.items), ...template.bonuses];
+  let selfDone = true, supDone = true, dirDone = true;
+  allItems.forEach(item => {
+    const s = score.items[item.id] || score.bonuses[item.id] || {};
+    if (s.self === undefined || s.self === '' || s.self === null) selfDone = false;
+    if (s.supervisor === undefined || s.supervisor === '' || s.supervisor === null) supDone = false;
+    if (s.director === undefined || s.director === '' || s.director === null) dirDone = false;
+  });
+  return { self: selfDone, supervisor: supDone, director: dirDone, all: selfDone && supDone && dirDone };
+}
+
+// ============ 月份管理 ============
+function getAvailableMonths() {
+  const now = new Date();
+  const startYear = 2026, startMonth = 7; // 2026-08，0-indexed
+  const endYear = now.getFullYear();
+  const endMonth = now.getMonth() - 1; // 考核月份=当前月份-1，0-indexed
+  const months = [];
+  let y = startYear, m = startMonth;
+  while (y < endYear || (y === endYear && m <= endMonth)) {
+    months.push(y + '-' + String(m + 1).padStart(2, '0'));
+    m++;
+    if (m > 11) { m = 0; y++; }
+  }
+  return months.reverse(); // 最新的在前面
+}
+
+function initMonths() {
+  const selector = document.getElementById('monthSelector');
+  const months = getAvailableMonths();
+  selector.innerHTML = months.map(m => `<option value="${m}">${m}</option>`).join('');
+  currentMonth = months[0];
+  selector.value = currentMonth;
+  loadMonthFromCloud(currentMonth);
+  selector.addEventListener('change', () => {
+    currentMonth = selector.value;
+  loadMonthFromCloud(currentMonth);
+    renderPage();
+  });
+}
+
+// ============ 页面路由 ============
+document.querySelectorAll('.sidebar-item').forEach(item => {
+  item.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+    item.classList.add('active');
+    currentPage = item.dataset.page;
+    renderPage();
+  });
+});
+
+function renderPage() {
+  const titles = {
+    dashboard: '仪表盘',
+    monthly: '月度考核',
+    summary: '数据汇总',
+    employees: '员工管理',
+    templates: '考核模板',
+    settings: '数据备份'
+  };
+  document.getElementById('pageTitle').textContent = titles[currentPage] || '';
+  const content = document.getElementById('pageContent');
+  content.classList.remove('fade-in');
+  void content.offsetWidth;
+  content.classList.add('fade-in');
+  
+  if (currentPage === 'dashboard') renderDashboard();
+  else if (currentPage === 'monthly') renderMonthly();
+  else if (currentPage === 'summary') renderSummary();
+  else if (currentPage === 'employees') renderEmployees();
+  else if (currentPage === 'templates') renderTemplates();
+  else if (currentPage === 'settings') renderSettings();
+}
+
+// ============ 仪表盘 ============
+function renderDashboard() {
+  const content = document.getElementById('pageContent');
+  const emps = appData.employees;
+  const month = currentMonth;
+  
+  let selfDone = 0, supDone = 0, dirDone = 0, allDone = 0;
+  const deptStats = {};
+  const scoreList = [];
+  
+  emps.forEach(emp => {
+    const status = getEmpStatus(emp, month);
+    if (status.self) selfDone++;
+    if (status.supervisor) supDone++;
+    if (status.director) dirDone++;
+    if (status.all) allDone++;
+    if (!deptStats[emp.dept]) deptStats[emp.dept] = { total: 0, done: 0 };
+    deptStats[emp.dept].total++;
+    if (status.all) deptStats[emp.dept].done++;
+    const calc = calcEmpScore(emp, month);
+    if (status.all) scoreList.push(calc.total);
+  });
+  
+  const avgScore = scoreList.length > 0 ? (scoreList.reduce((a,b) => a+b, 0) / scoreList.length).toFixed(1) : '-';
+  
+  // 待办列表
+  const pending = [];
+  emps.forEach(emp => {
+    const status = getEmpStatus(emp, month);
+    if (!status.all) {
+      const missing = [];
+      if (!status.self) missing.push('自评');
+      if (!status.supervisor) missing.push('上级评分');
+      if (!status.director) missing.push('总监评分');
+      pending.push({ emp, missing });
+    }
+  });
+  
+  content.innerHTML = `
+    <div class="grid grid-cols-4 gap-4 mb-6">
+      <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-100">
+        <div class="text-sm text-slate-500 mb-1">考核总人数</div>
+        <div class="text-3xl font-bold text-slate-800">${emps.length}</div>
+        <div class="text-xs text-slate-400 mt-2">${Object.keys(deptStats).length} 个部门</div>
+      </div>
+      <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-100">
+        <div class="text-sm text-slate-500 mb-1">自评完成</div>
+        <div class="text-3xl font-bold text-blue-600">${selfDone}<span class="text-lg text-slate-400">/${emps.length}</span></div>
+        <div class="w-full bg-slate-100 rounded-full h-1.5 mt-3"><div class="bg-blue-500 h-1.5 rounded-full" style="width:${selfDone/emps.length*100}%"></div></div>
+      </div>
+      <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-100">
+        <div class="text-sm text-slate-500 mb-1">上级评分完成</div>
+        <div class="text-3xl font-bold text-amber-600">${supDone}<span class="text-lg text-slate-400">/${emps.length}</span></div>
+        <div class="w-full bg-slate-100 rounded-full h-1.5 mt-3"><div class="bg-amber-500 h-1.5 rounded-full" style="width:${supDone/emps.length*100}%"></div></div>
+      </div>
+      <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-100">
+        <div class="text-sm text-slate-500 mb-1">总监评分完成</div>
+        <div class="text-3xl font-bold text-emerald-600">${dirDone}<span class="text-lg text-slate-400">/${emps.length}</span></div>
+        <div class="w-full bg-slate-100 rounded-full h-1.5 mt-3"><div class="bg-emerald-500 h-1.5 rounded-full" style="width:${dirDone/emps.length*100}%"></div></div>
+      </div>
+    </div>
+    
+    <div class="grid grid-cols-3 gap-4 mb-6">
+      <div class="bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl p-5 text-white shadow-sm">
+        <div class="text-sm opacity-80 mb-1">全部完成</div>
+        <div class="text-3xl font-bold">${allDone}<span class="text-lg opacity-70">/${emps.length}</span></div>
+        <div class="text-xs opacity-70 mt-2">完成率 ${(allDone/emps.length*100).toFixed(0)}%</div>
+      </div>
+      <div class="bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-xl p-5 text-white shadow-sm">
+        <div class="text-sm opacity-80 mb-1">已完成平均分</div>
+        <div class="text-3xl font-bold">${avgScore}</div>
+        <div class="text-xs opacity-70 mt-2">基于 ${scoreList.length} 人数据</div>
+      </div>
+      <div class="bg-gradient-to-br from-rose-500 to-rose-700 rounded-xl p-5 text-white shadow-sm">
+        <div class="text-sm opacity-80 mb-1">待处理</div>
+        <div class="text-3xl font-bold">${pending.length}</div>
+        <div class="text-xs opacity-70 mt-2">人尚未完成全部评分</div>
+      </div>
+    </div>
+    
+    <div class="grid grid-cols-2 gap-4">
+      <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-100">
+        <h3 class="font-bold text-slate-800 mb-4">各部门完成进度</h3>
+        <div class="space-y-3">
+          ${Object.entries(deptStats).map(([dept, s]) => `
+            <div>
+              <div class="flex justify-between text-sm mb-1">
+                <span class="text-slate-600">${dept}</span>
+                <span class="text-slate-400">${s.done}/${s.total}</span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2">
+                <div class="bg-gradient-to-r from-blue-400 to-blue-600 h-2 rounded-full transition-all" style="width:${s.done/s.total*100}%"></div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-100">
+        <h3 class="font-bold text-slate-800 mb-4">待办提醒</h3>
+        ${pending.length === 0 ? '<div class="text-center text-slate-400 py-8">全部完成，没有待办</div>' : `
+          <div class="space-y-2 max-h-64 overflow-y-auto scrollbar-thin">
+            ${pending.map(p => `
+              <div class="flex items-center justify-between p-2.5 bg-slate-50 rounded-lg">
+                <div>
+                  <span class="font-medium text-slate-700 text-sm">${p.emp.name}</span>
+                  <span class="text-xs text-slate-400 ml-2">${p.emp.dept} · ${p.emp.position}</span>
+                </div>
+                <div class="flex gap-1">
+                  ${p.missing.map(m => `<span class="text-xs px-2 py-0.5 bg-rose-100 text-rose-600 rounded">${m}</span>`).join('')}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `}
+      </div>
+    </div>
+    
+    <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-100 mt-4">
+      <h3 class="font-bold text-slate-800 mb-4">分数分布（已完成人员）</h3>
+      <canvas id="scoreChart" height="80"></canvas>
+    </div>
+  `;
+  
+  // 渲染图表
+  if (scoreList.length > 0) {
+    setTimeout(() => {
+      const ctx = document.getElementById('scoreChart');
+      if (ctx) {
+        if (charts.score) charts.score.destroy();
+        const bins = [0,0,0,0,0,0]; // <60, 60-70, 70-80, 80-90, 90-100, >100
+        scoreList.forEach(s => {
+          if (s < 60) bins[0]++;
+          else if (s < 70) bins[1]++;
+          else if (s < 80) bins[2]++;
+          else if (s < 90) bins[3]++;
+          else if (s <= 100) bins[4]++;
+          else bins[5]++;
+        });
+        charts.score = new Chart(ctx, {
+          type: 'bar',
+          data: {
+            labels: ['<60分', '60-70分', '70-80分', '80-90分', '90-100分', '>100分'],
+            datasets: [{
+              label: '人数',
+              data: bins,
+              backgroundColor: ['#ef4444','#f97316','#eab308','#22c55e','#3b82f6','#8b5cf6'],
+              borderRadius: 6
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+          }
+        });
+      }
+    }, 100);
+  }
+}
+
+// ============ 月度考核 ============
+function renderMonthly() {
+  const content = document.getElementById('pageContent');
+  const emps = appData.employees;
+  const month = currentMonth;
+  
+  // 按部门分组
+  const byDept = {};
+  emps.forEach(emp => {
+    if (!byDept[emp.dept]) byDept[emp.dept] = [];
+    byDept[emp.dept].push(emp);
+  });
+  
+  content.innerHTML = `
+    <div class="space-y-6">
+      ${Object.entries(byDept).map(([dept, deptEmps]) => `
+        <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+          <div class="px-5 py-3 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+            <h3 class="font-bold text-slate-800">${dept}</h3>
+            <span class="text-xs text-slate-400">${deptEmps.length} 人</span>
+          </div>
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-slate-500 border-b border-slate-100">
+                <th class="text-left px-5 py-3 font-medium">姓名</th>
+                <th class="text-left px-3 py-3 font-medium">岗位</th>
+                <th class="text-center px-3 py-3 font-medium">自评</th>
+                <th class="text-center px-3 py-3 font-medium">上级评分</th>
+                <th class="text-center px-3 py-3 font-medium">总监评分</th>
+                <th class="text-center px-3 py-3 font-medium">最终得分</th>
+                <th class="text-center px-3 py-3 font-medium">状态</th>
+                <th class="text-center px-5 py-3 font-medium">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${deptEmps.map(emp => {
+                const status = getEmpStatus(emp, month);
+                const calc = calcEmpScore(emp, month);
+                const statusBadge = status.all 
+                  ? '<span class="px-2 py-0.5 bg-emerald-100 text-emerald-600 rounded text-xs">已完成</span>'
+                  : '<span class="px-2 py-0.5 bg-amber-100 text-amber-600 rounded text-xs">进行中</span>';
+                const fmtScore = (val, done) => done 
+                  ? `<span class="text-emerald-600 font-medium">${val}</span>`
+                  : (val > 0 ? `<span class="text-amber-500">${val}</span>` : '<span class="text-slate-300">—</span>');
+                return `
+                  <tr class="border-b border-slate-50 hover:bg-slate-50 transition">
+                    <td class="px-5 py-3 font-medium text-slate-700">${emp.name}</td>
+                    <td class="px-3 py-3 text-slate-500">${emp.position}</td>
+                    <td class="px-3 py-3 text-center">${fmtScore(calc.selfTotal, status.self)}</td>
+                    <td class="px-3 py-3 text-center">${fmtScore(calc.supTotal, status.supervisor)}</td>
+                    <td class="px-3 py-3 text-center">${fmtScore(calc.dirTotal, status.director)}</td>
+                    <td class="px-3 py-3 text-center font-bold ${calc.total >= 80 ? 'text-emerald-600' : calc.total >= 60 ? 'text-amber-600' : 'text-rose-600'}">${status.all ? calc.total : (calc.total > 0 ? `<span class="text-amber-500">${calc.total}</span>` : '—')}</td>
+                    <td class="px-3 py-3 text-center">${statusBadge}</td>
+                    <td class="px-5 py-3 text-center">
+                      <button onclick="openScoreEditor('${emp.id}')" class="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-xs transition">打分</button>
+                      <button onclick="printEmp('${emp.id}')" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded text-xs transition ml-1">打印</button>
+                    </td>
+                  </tr>
+                `;
+              }).join('')}
+            </tbody>
+          </table>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+// ============ 打分编辑器 ============
+let editingEmpId = null;
+
+function openScoreEditor(empId) {
+  editingEmpId = empId;
+  const emp = appData.employees.find(e => e.id === empId);
+  const template = getTemplate(emp.templateKey, currentMonth);
+  const score = getEmpScore(currentMonth, empId);
+  const w = template.weights;
+  
+  const modal = document.createElement('div');
+  modal.id = 'scoreModal';
+  modal.className = 'fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4';
+  modal.innerHTML = `
+    <div class="bg-white rounded-2xl w-full max-w-5xl max-h-[90vh] flex flex-col shadow-2xl">
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+        <div>
+          <h2 class="font-bold text-lg text-slate-800">${emp.name} — 绩效考核打分</h2>
+          <div class="text-xs text-slate-400 mt-0.5">${emp.dept} · ${emp.position} · ${currentMonth} · 权重：自评${w.self*100}% / 上级${w.supervisor*100}% / 总监${w.director*100}%</div>
+        </div>
+        <button onclick="closeScoreEditor()" class="text-slate-400 hover:text-slate-600 text-2xl leading-none">&times;</button>
+      </div>
+      <div class="flex-1 overflow-y-auto p-6 scrollbar-thin">
+        <div class="space-y-6">
+          ${template.categories.map(cat => `
+            <div>
+              <h3 class="font-bold text-slate-700 mb-3 flex items-center gap-2">
+                <span class="w-1 h-4 bg-blue-500 rounded"></span>
+                ${cat.name}
+              </h3>
+              <table class="w-full text-sm border border-slate-200 rounded-lg overflow-hidden">
+                <thead class="bg-slate-50">
+                  <tr class="text-slate-600">
+                    <th class="text-left px-3 py-2 font-medium w-8">#</th>
+                    <th class="text-left px-3 py-2 font-medium">考核事项</th>
+                    <th class="text-left px-3 py-2 font-medium w-1/4">考核标准</th>
+                    <th class="text-center px-2 py-2 font-medium w-16">分值</th>
+                    <th class="text-center px-2 py-2 font-medium w-20">自评</th>
+                    <th class="text-center px-2 py-2 font-medium w-20">上级</th>
+                    <th class="text-center px-2 py-2 font-medium w-20">总监</th>
+                    <th class="text-center px-2 py-2 font-medium w-20">综合</th>
+                    <th class="text-left px-2 py-2 font-medium w-40">备注/评语</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${cat.items.map((item, idx) => {
+                    const s = score.items[item.id] || {};
+                    return `
+                      <tr class="border-t border-slate-100">
+                        <td class="px-3 py-2 text-slate-400">${idx+1}</td>
+                        <td class="px-3 py-2 font-medium text-slate-700">${item.name}</td>
+                        <td class="px-3 py-2 text-slate-500 text-xs leading-relaxed">${renderStandard(item.standard, item.id, false)}</td>
+                        <td class="px-2 py-2 text-center text-slate-500">${item.maxScore}</td>
+                        <td class="px-2 py-2"><input type="number" class="score-input w-full border border-slate-200 rounded px-2 py-1 text-center text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" value="${s.self !== undefined ? s.self : ''}" max="${item.maxScore}" onchange="updateScore('${item.id}','self',this.value,false)" oninput="updateScoreLive(this,'${item.id}','self',false,${item.maxScore})"></td>
+                        <td class="px-2 py-2"><input type="number" class="score-input w-full border border-slate-200 rounded px-2 py-1 text-center text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" value="${s.supervisor !== undefined ? s.supervisor : ''}" max="${item.maxScore}" onchange="updateScore('${item.id}','supervisor',this.value,false)" oninput="updateScoreLive(this,'${item.id}','supervisor',false,${item.maxScore})"></td>
+                        <td class="px-2 py-2"><input type="number" class="score-input w-full border border-slate-200 rounded px-2 py-1 text-center text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" value="${s.director !== undefined ? s.director : ''}" max="${item.maxScore}" onchange="updateScore('${item.id}','director',this.value,false)" oninput="updateScoreLive(this,'${item.id}','director',false,${item.maxScore})"></td>
+                        <td class="px-2 py-2 text-center font-medium text-blue-600" id="weighted-${item.id}">—</td>
+                        <td class="px-2 py-2"><input type="text" class="w-full border border-slate-200 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-blue-400" placeholder="打分理由..." value="${s.remark || ''}" onchange="updateRemark('${item.id}',this.value,false)"></td>
+                      </tr>
+                    `;
+                  }).join('')}
+                </tbody>
+              </table>
+            </div>
+          `).join('')}
+          ${template.bonuses.length > 0 ? `
+            <div>
+              <h3 class="font-bold text-slate-700 mb-3 flex items-center gap-2">
+                <span class="w-1 h-4 bg-amber-500 rounded"></span>
+                其他及加分项
+              </h3>
+              <table class="w-full text-sm border border-slate-200 rounded-lg overflow-hidden">
+                <thead class="bg-amber-50">
+                  <tr class="text-slate-600">
+                    <th class="text-left px-3 py-2 font-medium w-8">#</th>
+                    <th class="text-left px-3 py-2 font-medium">项目</th>
+                    <th class="text-left px-3 py-2 font-medium w-1/4">说明</th>
+                    <th class="text-center px-2 py-2 font-medium w-16">上限</th>
+                    <th class="text-center px-2 py-2 font-medium w-20">自评</th>
+                    <th class="text-center px-2 py-2 font-medium w-20">上级</th>
+                    <th class="text-center px-2 py-2 font-medium w-20">总监</th>
+                    <th class="text-center px-2 py-2 font-medium w-20">综合</th>
+                    <th class="text-left px-2 py-2 font-medium w-40">备注/评语</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${template.bonuses.map((item, idx) => {
+                    const s = score.bonuses[item.id] || {};
+                    return `
+                      <tr class="border-t border-slate-100">
+                        <td class="px-3 py-2 text-slate-400">${idx+1}</td>
+                        <td class="px-3 py-2 font-medium text-slate-700">${item.name}</td>
+                        <td class="px-3 py-2 text-slate-500 text-xs leading-relaxed">${renderStandard(item.standard, item.id, true)}</td>
+                        <td class="px-2 py-2 text-center text-slate-500">${item.maxScore || '—'}</td>
+                        <td class="px-2 py-2"><input type="number" class="score-input w-full border border-slate-200 rounded px-2 py-1 text-center text-sm focus:outline-none focus:ring-2 focus:ring-amber-400" value="${s.self !== undefined ? s.self : ''}" onchange="updateScore('${item.id}','self',this.value,true)" oninput="updateScoreLive(this,'${item.id}','self',true,999)"></td>
+                        <td class="px-2 py-2"><input type="number" class="score-input w-full border border-slate-200 rounded px-2 py-1 text-center text-sm focus:outline-none focus:ring-2 focus:ring-amber-400" value="${s.supervisor !== undefined ? s.supervisor : ''}" onchange="updateScore('${item.id}','supervisor',this.value,true)" oninput="updateScoreLive(this,'${item.id}','supervisor',true,999)"></td>
+                        <td class="px-2 py-2"><input type="number" class="score-input w-full border border-slate-200 rounded px-2 py-1 text-center text-sm focus:outline-none focus:ring-2 focus:ring-amber-400" value="${s.director !== undefined ? s.director : ''}" onchange="updateScore('${item.id}','director',this.value,true)" oninput="updateScoreLive(this,'${item.id}','director',true,999)"></td>
+                        <td class="px-2 py-2 text-center font-medium text-amber-600" id="weighted-${item.id}">—</td>
+                        <td class="px-2 py-2"><input type="text" class="w-full border border-slate-200 rounded px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-amber-400" placeholder="加分理由..." value="${s.remark || ''}" onchange="updateRemark('${item.id}',this.value,true)"></td>
+                      </tr>
+                    `;
+                  }).join('')}
+                </tbody>
+              </table>
+            </div>
+          ` : ''}
+        </div>
+      </div>
+      <div class="px-6 py-4 border-t border-slate-100 bg-slate-50">
+        <div class="flex items-center gap-8 mb-3 text-sm pb-3 border-b border-slate-200">
+          <div class="text-slate-500">自评总分：<span id="modalSelfTotal" class="font-bold text-slate-700 ml-1">0</span></div>
+          <div class="text-slate-500">上级总分：<span id="modalSupTotal" class="font-bold text-slate-700 ml-1">0</span></div>
+          <div class="text-slate-500">总监总分：<span id="modalDirTotal" class="font-bold text-slate-700 ml-1">0</span></div>
+        </div>
+        <div class="flex items-center justify-between">
+          <div class="text-sm text-slate-500">
+            最终得分：<span id="modalTotal" class="text-2xl font-bold text-blue-600 ml-2">0</span> 分
+          </div>
+          <div class="flex gap-2">
+            <button onclick="closeScoreEditor()" class="px-4 py-2 border border-slate-300 rounded-lg text-sm text-slate-600 hover:bg-slate-100 transition">关闭</button>
+            <button onclick="saveAndClose()" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm transition">保存并关闭</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  recalcModal();
+}
+
+function updateScoreLive(input, itemId, field, isBonus, max) {
+  let val = parseFloat(input.value);
+  if (isNaN(val)) val = 0;
+  if (val > max) { val = max; input.value = max; }
+  if (val < 0) { val = 0; input.value = 0; }
+  const score = getEmpScore(currentMonth, editingEmpId);
+  const target = isBonus ? score.bonuses : score.items;
+  if (!target[itemId]) target[itemId] = {};
+  target[itemId][field] = input.value === '' ? '' : val;
+  recalcModal();
+}
+
+function updateScore(itemId, field, value, isBonus) {
+  const score = getEmpScore(currentMonth, editingEmpId);
+  const target = isBonus ? score.bonuses : score.items;
+  if (!target[itemId]) target[itemId] = {};
+  target[itemId][field] = value === '' ? '' : parseFloat(value);
+  saveData();
+  recalcModal();
+}
+
+function updateRemark(itemId, value, isBonus) {
+  const score = getEmpScore(currentMonth, editingEmpId);
+  const target = isBonus ? score.bonuses : score.items;
+  if (!target[itemId]) target[itemId] = {};
+  target[itemId].remark = value;
+  saveData();
+}
+
+// 把考核标准中的连续空格渲染成可填写的输入框
+function renderStandard(standard, itemId, isBonus) {
+  const score = getEmpScore(currentMonth, editingEmpId);
+  const target = isBonus ? score.bonuses : score.items;
+  if (!target[itemId]) target[itemId] = {};
+  if (!target[itemId].fields) target[itemId].fields = [];
+  
+  let fieldIndex = 0;
+  return standard.replace(/[ _]{3,}/g, (match) => {
+    const idx = fieldIndex++;
+    const val = target[itemId].fields[idx] || '';
+    const w = Math.min(match.length * 8, 100);
+    return `<input type="text" class="data-input inline-block border-b border-blue-400 bg-blue-50 px-1 text-center text-xs focus:outline-none focus:border-blue-600 focus:bg-blue-100" style="width:${w}px;min-width:50px;" value="${val.replace(/"/g, '&quot;')}" placeholder="填写" onchange="updateDataField('${itemId}',${idx},this.value,${isBonus})">`;
+  });
+}
+
+function updateDataField(itemId, fieldIdx, value, isBonus) {
+  const score = getEmpScore(currentMonth, editingEmpId);
+  const target = isBonus ? score.bonuses : score.items;
+  if (!target[itemId]) target[itemId] = {};
+  if (!target[itemId].fields) target[itemId].fields = [];
+  target[itemId].fields[fieldIdx] = value;
+  saveData();
+}
+
+function recalcModal() {
+  const emp = appData.employees.find(e => e.id === editingEmpId);
+  const calc = calcEmpScore(emp, currentMonth);
+  calc.itemScores.forEach(item => {
+    const el = document.getElementById('weighted-' + item.id);
+    if (el) el.textContent = item.weighted.toFixed(1);
+  });
+  const totalEl = document.getElementById('modalTotal');
+  if (totalEl) totalEl.textContent = calc.total.toFixed(1);
+  const selfEl = document.getElementById('modalSelfTotal');
+  if (selfEl) selfEl.textContent = calc.selfTotal.toFixed(1);
+  const supEl = document.getElementById('modalSupTotal');
+  if (supEl) supEl.textContent = calc.supTotal.toFixed(1);
+  const dirEl = document.getElementById('modalDirTotal');
+  if (dirEl) dirEl.textContent = calc.dirTotal.toFixed(1);
+}
+
+function closeScoreEditor() {
+  const modal = document.getElementById('scoreModal');
+  if (modal) modal.remove();
+  saveData();
+  renderPage();
+}
+
+function saveAndClose() {
+  saveData();
+  closeScoreEditor();
+}
+
+// ============ 打印单个员工 ============
+function printEmp(empId) {
+  const emp = appData.employees.find(e => e.id === empId);
+  const template = getTemplate(emp.templateKey, currentMonth);
+  const calc = calcEmpScore(emp, currentMonth);
+  const w = template.weights;
+  
+  let itemsHtml = '';
+  template.categories.forEach(cat => {
+    cat.items.forEach((item, idx) => {
+      const s = calc.itemScores.find(i => i.id === item.id) || {};
+      itemsHtml += `
+        <tr>
+          <td style="border:1px solid #333;padding:6px;text-align:center;">${idx+1}</td>
+          <td style="border:1px solid #333;padding:6px;">${item.name}</td>
+          <td style="border:1px solid #333;padding:6px;font-size:11px;">${item.standard}</td>
+          <td style="border:1px solid #333;padding:6px;text-align:center;">${item.maxScore}</td>
+          <td style="border:1px solid #333;padding:6px;text-align:center;">${s.self || ''}</td>
+          <td style="border:1px solid #333;padding:6px;text-align:center;">${s.supervisor || ''}</td>
+          <td style="border:1px solid #333;padding:6px;text-align:center;">${s.director || ''}</td>
+          <td style="border:1px solid #333;padding:6px;text-align:center;font-weight:bold;">${s.weighted ? s.weighted.toFixed(1) : ''}</td>
+        </tr>
+      `;
+    });
+  });
+  
+  if (template.bonuses.length > 0) {
+    template.bonuses.forEach((item, idx) => {
+      const s = calc.itemScores.find(i => i.id === item.id) || {};
+      itemsHtml += `
+        <tr>
+          <td style="border:1px solid #333;padding:6px;text-align:center;">${idx+1}</td>
+          <td style="border:1px solid #333;padding:6px;">${item.name}</td>
+          <td style="border:1px solid #333;padding:6px;font-size:11px;">${item.standard}</td>
+          <td style="border:1px solid #333;padding:6px;text-align:center;">加分</td>
+          <td style="border:1px solid #333;padding:6px;text-align:center;">${s.self || ''}</td>
+          <td style="border:1px solid #333;padding:6px;text-align:center;">${s.supervisor || ''}</td>
+          <td style="border:1px solid #333;padding:6px;text-align:center;">${s.director || ''}</td>
+          <td style="border:1px solid #333;padding:6px;text-align:center;font-weight:bold;">${s.weighted ? s.weighted.toFixed(1) : ''}</td>
+        </tr>
+      `;
+    });
+  }
+  
+  document.getElementById('printArea').innerHTML = `
+    <div style="padding:30px;font-family:'Microsoft YaHei',sans-serif;">
+      <h1 style="text-align:center;font-size:18px;margin-bottom:5px;">【2026.V2】${emp.dept}部门考核细则</h1>
+      <p style="text-align:center;font-size:12px;color:#666;margin-bottom:15px;">考核月份：${currentMonth}</p>
+      <table style="width:100%;border-collapse:collapse;margin-bottom:10px;font-size:13px;">
+        <tr>
+          <td style="padding:5px;width:15%;"><b>被考核人：</b>${emp.name}</td>
+          <td style="padding:5px;width:20%;"><b>部门：</b>${emp.dept}</td>
+          <td style="padding:5px;width:20%;"><b>职位：</b>${emp.position}</td>
+          <td style="padding:5px;width:25%;"><b>最终得分：</b><span style="font-size:16px;color:blue;font-weight:bold;">${calc.total.toFixed(1)}</span></td>
+        </tr>
+      </table>
+      <table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <thead>
+          <tr style="background:#f0f0f0;">
+            <th style="border:1px solid #333;padding:6px;width:5%;">序号</th>
+            <th style="border:1px solid #333;padding:6px;width:15%;">考核事项</th>
+            <th style="border:1px solid #333;padding:6px;width:35%;">考核标准</th>
+            <th style="border:1px solid #333;padding:6px;width:8%;">分值</th>
+            <th style="border:1px solid #333;padding:6px;width:9%;">自评(${w.self*100}%)</th>
+            <th style="border:1px solid #333;padding:6px;width:9%;">上级(${w.supervisor*100}%)</th>
+            <th style="border:1px solid #333;padding:6px;width:9%;">总监(${w.director*100}%)</th>
+            <th style="border:1px solid #333;padding:6px;width:10%;">综合得分</th>
+          </tr>
+        </thead>
+        <tbody>${itemsHtml}</tbody>
+      </table>
+      <div style="margin-top:30px;font-size:13px;">
+        <p><b>签名处</b></p>
+        <p style="margin-top:15px;">本人知悉并理解以上绩效考核目标及其内容，同意按公司绩效管理规定执行。</p>
+        <div style="margin-top:40px;display:flex;justify-content:space-between;">
+          <span>员工签字：________________</span>
+          <span>直接上级签字：________________</span>
+          <span>日期：________________</span>
+        </div>
+      </div>
+    </div>
+  `;
+  window.print();
+}
+
+// ============ 数据汇总 ============
+function renderSummary() {
+  const content = document.getElementById('pageContent');
+  const emps = appData.employees;
+  const months = getAvailableMonths().slice().reverse(); // 按时间从早到晚
+  
+  // 计算每个员工每个月的得分
+  const empScores = emps.map(emp => {
+    const monthly = {};
+    let totalScore = 0, doneMonths = 0;
+    months.forEach(m => {
+      const calc = calcEmpScore(emp, m);
+      const status = getEmpStatus(emp, m);
+      monthly[m] = { total: calc.total, done: status.all, selfTotal: calc.selfTotal, supTotal: calc.supTotal, dirTotal: calc.dirTotal };
+      if (status.all) {
+        totalScore += calc.total;
+        doneMonths++;
+      }
+    });
+    const avg = doneMonths > 0 ? totalScore / doneMonths : 0;
+    return { emp, monthly, avg, doneMonths };
+  });
+  
+  // 按部门分组
+  const byDept = {};
+  empScores.forEach(r => {
+    if (!byDept[r.emp.dept]) byDept[r.emp.dept] = [];
+    byDept[r.emp.dept].push(r);
+  });
+  
+  // 部门统计（所有月份平均）
+  const deptStats = {};
+  empScores.forEach(r => {
+    if (!deptStats[r.emp.dept]) deptStats[r.emp.dept] = { total: 0, done: 0 };
+    if (r.doneMonths > 0) {
+      deptStats[r.emp.dept].total += r.avg;
+      deptStats[r.emp.dept].done++;
+    }
+  });
+  
+  const scoreColor = (s) => s >= 90 ? 'text-emerald-600' : s >= 70 ? 'text-blue-600' : s >= 60 ? 'text-amber-600' : 'text-rose-600';
+  
+  content.innerHTML = `
+    <div class="grid grid-cols-5 gap-4 mb-6">
+      ${Object.entries(deptStats).map(([dept, s]) => `
+        <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-100">
+          <div class="text-sm text-slate-500">${dept}</div>
+          <div class="text-2xl font-bold text-slate-800 mt-1">${s.done > 0 ? (s.total/s.done).toFixed(1) : '—'}</div>
+          <div class="text-xs text-slate-400 mt-1">人均月均 · ${s.done}人有数据</div>
+        </div>
+      `).join('')}
+    </div>
+    
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+      <div class="px-5 py-3 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+        <h3 class="font-bold text-slate-800">全员月度总分趋势</h3>
+        <span class="text-xs text-slate-400">从2026-08月起 · 仅显示已完成月份的分数</span>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-slate-500 border-b border-slate-100">
+              <th class="text-left px-4 py-3 font-medium sticky left-0 bg-slate-50">姓名</th>
+              <th class="text-left px-4 py-3 font-medium">部门</th>
+              <th class="text-left px-4 py-3 font-medium">岗位</th>
+              ${months.map(m => `<th class="text-center px-4 py-3 font-medium">${m}</th>`).join('')}
+              <th class="text-center px-4 py-3 font-medium bg-blue-50">月均分</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${Object.entries(byDept).map(([dept, list]) => `
+              ${list.map((r, idx) => `
+                <tr class="border-b border-slate-50 hover:bg-slate-50 transition">
+                  <td class="px-4 py-3 font-medium text-slate-700 sticky left-0 bg-white">${r.emp.name}</td>
+                  <td class="px-4 py-3 text-slate-500">${idx === 0 ? dept : ''}</td>
+                  <td class="px-4 py-3 text-slate-500">${r.emp.position}</td>
+                  ${months.map(m => {
+                    const d = r.monthly[m];
+                    return `<td class="px-4 py-3 text-center font-medium ${d.done ? scoreColor(d.total) : 'text-slate-300'}">${d.done ? d.total.toFixed(1) : '—'}</td>`;
+                  }).join('')}
+                  <td class="px-4 py-3 text-center font-bold bg-blue-50 ${r.doneMonths > 0 ? scoreColor(r.avg) : 'text-slate-300'}">${r.doneMonths > 0 ? r.avg.toFixed(1) : '—'}</td>
+                </tr>
+              `).join('')}
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    
+    <div class="mt-4 text-xs text-slate-400">
+      说明：表格中"—"表示该月考核尚未全部完成；月均分仅统计已完成月份的平均分。
+    </div>
+  `;
+}
+
+// ============ 员工管理 ============
+function renderEmployees() {
+  const content = document.getElementById('pageContent');
+  const emps = appData.employees;
+  const byDept = {};
+  emps.forEach(emp => {
+    if (!byDept[emp.dept]) byDept[emp.dept] = [];
+    byDept[emp.dept].push(emp);
+  });
+  
+  content.innerHTML = `
+    <div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+      <div class="px-5 py-3 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+        <h3 class="font-bold text-slate-800">员工列表（共 ${emps.length} 人）</h3>
+        <button onclick="addEmployee()" class="px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm transition">+ 添加员工</button>
+      </div>
+      ${Object.entries(byDept).map(([dept, deptEmps]) => `
+        <div class="border-b border-slate-100 last:border-0">
+          <div class="px-5 py-2 bg-slate-50/50 text-sm font-medium text-slate-600">${dept}（${deptEmps.length}人）</div>
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-slate-400 text-xs">
+                <th class="text-left px-5 py-2 font-medium">姓名</th>
+                <th class="text-left px-4 py-2 font-medium">岗位</th>
+                <th class="text-left px-4 py-2 font-medium">考核模板</th>
+                <th class="text-center px-5 py-2 font-medium">操作</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${deptEmps.map(emp => `
+                <tr class="border-t border-slate-50 hover:bg-slate-50">
+                  <td class="px-5 py-2.5 font-medium text-slate-700">${emp.name}</td>
+                  <td class="px-4 py-2.5 text-slate-500">${emp.position}</td>
+                  <td class="px-4 py-2.5 text-slate-400 text-xs">${emp.templateKey}</td>
+                  <td class="px-5 py-2.5 text-center">
+                    <button onclick="editEmployee('${emp.id}')" class="text-blue-500 hover:text-blue-700 text-xs mr-3">编辑</button>
+                    <button onclick="deleteEmployee('${emp.id}')" class="text-rose-500 hover:text-rose-700 text-xs">删除</button>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function addEmployee() {
+  const name = prompt('请输入员工姓名：');
+  if (!name) return;
+  const dept = prompt('请输入部门（如：市场部、内容部、电商部、电商仓、设计部）：');
+  if (!dept) return;
+  const position = prompt('请输入岗位：');
+  if (!position) return;
+  const templateKey = dept + '_' + position;
+  const newId = 'emp' + String(appData.employees.length + 1).padStart(3, '0');
+  appData.employees.push({ id: newId, name, dept, position, templateKey });
+  saveData();
+  renderPage();
+}
+
+function editEmployee(empId) {
+  const emp = appData.employees.find(e => e.id === empId);
+  const name = prompt('姓名：', emp.name);
+  if (name === null) return;
+  const dept = prompt('部门：', emp.dept);
+  if (dept === null) return;
+  const position = prompt('岗位：', emp.position);
+  if (position === null) return;
+  emp.name = name;
+  emp.dept = dept;
+  emp.position = position;
+  emp.templateKey = dept + '_' + position;
+  saveData();
+  renderPage();
+}
+
+function deleteEmployee(empId) {
+  if (!confirm('确定删除该员工？其历史评分数据也会被删除。')) return;
+  appData.employees = appData.employees.filter(e => e.id !== empId);
+  Object.keys(appData.monthlyData).forEach(m => {
+    delete appData.monthlyData[m][empId];
+  });
+  saveData();
+  renderPage();
+}
+
+// ============ 考核模板 ============
+function renderTemplates() {
+  const content = document.getElementById('pageContent');
+  const templates = appData.templates;
+  
+  content.innerHTML = `
+    <div class="mb-4 flex items-center justify-between">
+      <p class="text-sm text-slate-500">共 ${Object.keys(templates).length} 个岗位模板，支持版本迭代管理</p>
+    </div>
+    <div class="grid grid-cols-3 gap-4">
+      ${Object.entries(templates).map(([key, t]) => {
+        const latest = t.versions[t.versions.length - 1];
+        const totalItems = latest.categories.reduce((s, c) => s + c.items.length, 0);
+        const totalScore = latest.categories.reduce((s, c) => s + c.items.reduce((a, i) => a + i.maxScore, 0), 0);
+        const empCount = appData.employees.filter(e => e.templateKey === key).length;
+        return `
+          <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-100 hover:shadow-md transition cursor-pointer" onclick="viewTemplate('${key}')">
+            <div class="flex items-start justify-between mb-3">
+              <h3 class="font-bold text-slate-800">${key.replace('_', ' · ')}</h3>
+              <span class="text-xs px-2 py-0.5 bg-blue-100 text-blue-600 rounded">${empCount}人</span>
+            </div>
+            <div class="text-xs text-slate-400 space-y-1">
+              <div>考核项：${totalItems} 项 · 满分：${totalScore} 分</div>
+              <div>加分项：${latest.bonuses.length} 项</div>
+              <div>权重：自评${latest.weights.self*100}% / 上级${latest.weights.supervisor*100}% / 总监${latest.weights.director*100}%</div>
+              <div class="pt-1 border-t border-slate-100 mt-1">
+                <span class="text-emerald-600">当前版本：${latest.version}</span>
+                <span class="text-slate-400 ml-2">${latest.effectiveMonth}起执行</span>
+                <span class="text-slate-400 ml-2">共${t.versions.length}个版本</span>
+              </div>
+            </div>
+            <div class="mt-3 text-xs text-blue-500">点击查看详情 / 管理版本 →</div>
+          </div>
+        `;
+      }).join('')}
+    </div>
+  `;
+}
+
+let viewingTemplateKey = null;
+let viewingVersionIdx = 0;
+
+function viewTemplate(key) {
+  viewingTemplateKey = key;
+  const t = appData.templates[key];
+  viewingVersionIdx = t.versions.length - 1;
+  renderTemplateModal();
+}
+
+function renderTemplateModal() {
+  const key = viewingTemplateKey;
+  const t = appData.templates[key];
+  const v = t.versions[viewingVersionIdx];
+  const isLatest = viewingVersionIdx === t.versions.length - 1;
+  
+  const oldModal = document.getElementById('templateModal');
+  if (oldModal) oldModal.remove();
+  
+  const modal = document.createElement('div');
+  modal.id = 'templateModal';
+  modal.className = 'fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4';
+  modal.innerHTML = `
+    <div class="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl">
+      <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+        <div>
+          <h2 class="font-bold text-lg text-slate-800">${key.replace('_', ' · ')}</h2>
+          <div class="text-xs text-slate-400 mt-0.5">权重：自评${v.weights.self*100}% / 上级${v.weights.supervisor*100}% / 总监${v.weights.director*100}%</div>
+        </div>
+        <button onclick="document.getElementById('templateModal').remove()" class="text-slate-400 hover:text-slate-600 text-2xl leading-none">&times;</button>
+      </div>
+      
+      <!-- 版本管理区 -->
+      <div class="px-6 py-3 bg-slate-50 border-b border-slate-100">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm font-medium text-slate-600">版本历史</span>
+          <button onclick="addTemplateVersion()" class="text-xs px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded transition">+ 新增版本</button>
+        </div>
+        <div class="flex gap-2 flex-wrap">
+          ${t.versions.map((ver, idx) => `
+            <div onclick="switchVersion(${idx})" class="cursor-pointer px-3 py-2 rounded-lg border transition ${idx === viewingVersionIdx ? 'bg-blue-50 border-blue-300' : 'bg-white border-slate-200 hover:border-blue-300'}">
+              <div class="text-xs font-bold ${idx === viewingVersionIdx ? 'text-blue-600' : 'text-slate-700'}">${ver.version} ${idx === t.versions.length - 1 ? '<span class="text-emerald-500 ml-1">当前</span>' : ''}</div>
+              <div class="text-xs text-slate-400 mt-0.5">${ver.effectiveMonth}起执行</div>
+              <div class="text-xs text-slate-500 mt-0.5 max-w-[150px] truncate">${ver.note}</div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      
+      <div class="flex-1 overflow-y-auto p-6 scrollbar-thin">
+        ${!isLatest ? '<div class="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-700">⚠️ 正在查看历史版本，非当前执行版本</div>' : ''}
+        ${v.categories.map(cat => `
+          <div class="mb-6">
+            <h3 class="font-bold text-slate-700 mb-2">${cat.name}</h3>
+            <table class="w-full text-sm border border-slate-200 rounded-lg overflow-hidden">
+              <thead class="bg-slate-50">
+                <tr class="text-slate-600">
+                  <th class="text-left px-3 py-2 font-medium w-8">#</th>
+                  <th class="text-left px-3 py-2 font-medium w-1/4">考核事项</th>
+                  <th class="text-left px-3 py-2 font-medium">考核标准</th>
+                  <th class="text-center px-3 py-2 font-medium w-16">分值</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${cat.items.map((item, idx) => `
+                  <tr class="border-t border-slate-100">
+                    <td class="px-3 py-2 text-slate-400">${idx+1}</td>
+                    <td class="px-3 py-2 font-medium text-slate-700">${item.name}</td>
+                    <td class="px-3 py-2 text-slate-500 text-xs leading-relaxed">${item.standard}</td>
+                    <td class="px-3 py-2 text-center font-medium text-slate-600">${item.maxScore}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `).join('')}
+        ${v.bonuses.length > 0 ? `
+          <div>
+            <h3 class="font-bold text-slate-700 mb-2">其他及加分项</h3>
+            <table class="w-full text-sm border border-slate-200 rounded-lg overflow-hidden">
+              <thead class="bg-amber-50">
+                <tr class="text-slate-600">
+                  <th class="text-left px-3 py-2 font-medium w-8">#</th>
+                  <th class="text-left px-3 py-2 font-medium w-1/4">项目</th>
+                  <th class="text-left px-3 py-2 font-medium">说明</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${v.bonuses.map((item, idx) => `
+                  <tr class="border-t border-slate-100">
+                    <td class="px-3 py-2 text-slate-400">${idx+1}</td>
+                    <td class="px-3 py-2 font-medium text-slate-700">${item.name}</td>
+                    <td class="px-3 py-2 text-slate-500 text-xs leading-relaxed">${item.standard}</td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        ` : ''}
+      </div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+function switchVersion(idx) {
+  viewingVersionIdx = idx;
+  renderTemplateModal();
+}
+
+function addTemplateVersion() {
+  const key = viewingTemplateKey;
+  const t = appData.templates[key];
+  const latest = t.versions[t.versions.length - 1];
+  const newVersion = 'v' + (t.versions.length + 1);
+  
+  // 简单弹窗输入生效月份和变更说明
+  const effectiveMonth = prompt('请输入新版本生效月份（格式：2026-10）：', '2026-10');
+  if (!effectiveMonth) return;
+  const note = prompt('请输入版本变更说明：', '调整考核内容');
+  if (!note) return;
+  
+  // 复制最新版本作为基础
+  const newVer = JSON.parse(JSON.stringify(latest));
+  newVer.version = newVersion;
+  newVer.effectiveMonth = effectiveMonth;
+  newVer.note = note;
+  t.versions.push(newVer);
+  
+  // 按生效月份排序
+  t.versions.sort((a, b) => a.effectiveMonth.localeCompare(b.effectiveMonth));
+  // 重新编号版本号
+  t.versions.forEach((v, i) => v.version = 'v' + (i + 1));
+  
+  saveData();
+  viewingVersionIdx = t.versions.length - 1;
+  renderTemplateModal();
+  renderTemplates();
+}
+
+// ============ 数据备份 ============
+function renderSettings() {
+  const content = document.getElementById('pageContent');
+  const monthCount = Object.keys(appData.monthlyData).length;
+  const totalRecords = Object.values(appData.monthlyData).reduce((s, m) => s + Object.keys(m).length, 0);
+  
+  content.innerHTML = `
+    <div class="max-w-2xl">
+      <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-100 mb-4">
+        <h3 class="font-bold text-slate-800 mb-4">数据概览</h3>
+        <div class="grid grid-cols-3 gap-4 text-center">
+          <div class="p-4 bg-slate-50 rounded-lg">
+            <div class="text-2xl font-bold text-blue-600">${appData.employees.length}</div>
+            <div class="text-xs text-slate-400 mt-1">员工数</div>
+          </div>
+          <div class="p-4 bg-slate-50 rounded-lg">
+            <div class="text-2xl font-bold text-emerald-600">${Object.keys(appData.templates).length}</div>
+            <div class="text-xs text-slate-400 mt-1">考核模板</div>
+          </div>
+          <div class="p-4 bg-slate-50 rounded-lg">
+            <div class="text-2xl font-bold text-amber-600">${monthCount}</div>
+            <div class="text-xs text-slate-400 mt-1">历史月份（${totalRecords}条记录）</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-100 mb-4">
+        <h3 class="font-bold text-slate-800 mb-2">导出数据</h3>
+        <p class="text-sm text-slate-500 mb-4">将所有数据（员工、模板、历史评分）导出为JSON文件，可用于备份或迁移到其他电脑。</p>
+        <button onclick="exportData()" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm transition">导出 JSON 备份</button>
+      </div>
+      
+      <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-100 mb-4">
+        <h3 class="font-bold text-slate-800 mb-2">导入数据</h3>
+        <p class="text-sm text-slate-500 mb-4">从JSON备份文件恢复数据。注意：这会覆盖当前所有数据。</p>
+        <input type="file" id="importFile" accept=".json" class="hidden" onchange="importData(event)">
+        <button onclick="document.getElementById('importFile').click()" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm transition">选择文件导入</button>
+      </div>
+      
+      <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-100">
+        <h3 class="font-bold text-rose-600 mb-2">危险操作</h3>
+        <p class="text-sm text-slate-500 mb-4">清空所有评分数据（保留员工和模板），或重置全部数据为初始状态。</p>
+        <div class="flex gap-2">
+          <button onclick="clearScores()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-sm transition">清空所有评分</button>
+          <button onclick="resetAll()" class="px-4 py-2 bg-rose-500 hover:bg-rose-600 text-white rounded-lg text-sm transition">重置全部数据</button>
+        </div>
+      </div>
+      
+      <div class="mt-6 p-4 bg-blue-50 rounded-lg text-sm text-blue-700">
+        <b>使用提示：</b>数据保存在浏览器本地存储中。建议每月导出一次JSON备份，防止浏览器清理缓存导致数据丢失。换电脑使用时，导出备份后在新电脑上导入即可。
+      </div>
+    </div>
+  `;
+}
+
+function exportData() {
+  const blob = new Blob([JSON.stringify(appData, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = '雪豹绩效数据备份_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (data.employees && data.templates) {
+        appData = data;
+        if (!appData.monthlyData) appData.monthlyData = {};
+        saveData();
+        alert('导入成功！');
+        renderPage();
+      } else {
+        alert('文件格式不正确');
+      }
+    } catch(err) {
+      alert('导入失败：' + err.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+function clearScores() {
+  if (!confirm('确定清空所有月份的评分数据？员工和模板会保留。')) return;
+  appData.monthlyData = {};
+  saveData();
+  renderPage();
+}
+
+function resetAll() {
+  if (!confirm('确定重置全部数据？这会恢复到初始状态，所有员工修改和评分都会丢失！')) return;
+  appData = JSON.parse(JSON.stringify(DEFAULT_DATA));
+  appData.monthlyData = {};
+  saveData();
+  renderPage();
+}
+
+// ============ 初始化 ============
+loadData();
+initMonths();
+renderPage();
+</script>
+</body>
+</html>

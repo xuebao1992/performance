@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: xuebao-performance
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn server:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: FEISHU_APP_ID
+        value: cli_aa23415d8c781bb7
+      - key: FEISHU_APP_SECRET
+        value: w4NtPJV1MuJkdTqDoWiMBcpSLgqkFth1
+      - key: BITABLE_APP_TOKEN
+        value: SUCswFlF5i3zwxkrHADci1Emnl3
+      - key: BITABLE_TABLE_ID
+        value: tblUq5sXETfPDOwH
